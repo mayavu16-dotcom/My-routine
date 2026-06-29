@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="My Routine" />
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+<title>My Routine</title>
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --surface2: #f0efec;
+    --text: #1a1a18;
+    --text2: #6b6b67;
+    --text3: #a0a09b;
+    --border: rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.14);
+    --accent: #3b7cf4;
+    --accent-bg: #eef3fe;
+    --accent-text: #1a4fb5;
+    --success: #16a362;
+    --success-bg: #e6f7ef;
+    --radius: 10px;
+    --radius-lg: 16px;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141413;
+      --surface: #1e1e1c;
+      --surface2: #252523;
+      --text: #f0efe9;
+      --text2: #9a9a94;
+      --text3: #5a5a56;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.14);
+      --accent: #5b92f6;
+      --accent-bg: #1a2a4a;
+      --accent-text: #93b8fa;
+      --success: #2ec67a;
+      --success-bg: #0d2e1e;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  /* NAV */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+    padding-top: env(safe-area-inset-top);
+  }
+  .nav-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  .nav-week { display: flex; align-items: center; gap: 6px; }
+  .nav-btn { background: var(--surface2); border: none; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 16px; color: var(--text); display: flex; align-items: center; justify-content: center; }
+  .nav-btn:active { opacity: 0.6; }
+  .week-label { font-size: 13px; color: var(--text2); min-width: 100px; text-align: center; }
+  /* TAB BAR */
+  .tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .tab { flex: 1; padding: 11px 0; font-size: 13px; font-weight: 500; color: var(--text3); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  /* VIEWS */
+  .view { display: none; padding: 16px; }
+  .view.active { display: block; }
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .stat-card { background: var(--surface); border-radius: var(--radius-lg); padding: 14px 16px; border: 1px solid var(--border); }
+  .stat-val { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+  .stat-lbl { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .progress-bar { height: 3px; background: var(--surface2); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s; }
+  /* SECTION HEADER */
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .section-title { font-size: 13px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
+  .add-btn { background: var(--accent-bg); color: var(--accent-text); border: none; border-radius: 8px; padding: 5px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .add-btn:active { opacity: 0.7; }
+  /* BLOCKS LIST */
+  .blocks-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
+  .block-item {
+    background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border);
+    padding: 13px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .block-item.done { opacity: 0.45; }
+  .block-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .block-info { flex: 1; min-width: 0; }
+  .block-name { font-size: 15px; font-weight: 500; color: var(--text); }
+  .block-item.done .block-name { text-decoration: line-through; color: var(--text3); }
+  .block-time { font-size: 12px; color: var(--text3); margin-top: 1px; }
+  .block-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, border-color 0.15s; }
+  .block-item.done .block-check { background: var(--success); border-color: var(--success); }
+  .check-icon { display: none; color: #fff; font-size: 13px; }
+  .block-item.done .check-icon { display: block; }
+  /* DAY SELECTOR */
+  .day-selector { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
+  .day-selector::-webkit-scrollbar { display: none; }
+  .day-pill { flex-shrink: 0; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border2); background: var(--surface); font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .day-pill .d-name { font-size: 11px; font-weight: 500; color: var(--text3); }
+  .day-pill .d-num { font-size: 15px; font-weight: 600; }
+  .day-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .day-pill.active .d-name { color: rgba(255,255,255,0.75); }
+  .day-pill.today-dot::after { content: ''; display: block; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); margin: 0 auto; margin-top: 2px; }
+  .day-pill.active.today-dot::after { background: rgba(255,255,255,0.8); }
+  /* HABITS VIEW */
+  .habit-table { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
+  .habit-row { display: flex; align-items: center; padding: 11px 14px; border-bottom: 1px solid var(--border); gap: 10px; }
+  .habit-row:last-child { border-bottom: none; }
+  .habit-name { font-size: 14px; font-weight: 500; flex: 1; color: var(--text); }
+  .habit-days { display: flex; gap: 4px; }
+  .h-dot { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border2); background: var(--surface2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: var(--text3); transition: background 0.15s, border-color 0.15s; flex-shrink: 0; }
+  .h-dot.done { background: var(--success); border-color: var(--success); color: #fff; }
+  .habit-pct { font-size: 12px; color: var(--text3); min-width: 30px; text-align: right; }
+  .habit-head { display: flex; align-items: center; padding: 8px 14px; background: var(--surface2); gap: 10px; }
+  .habit-head-name { flex: 1; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+  .habit-day-labels { display: flex; gap: 4px; }
+  .h-day-lbl { width: 28px; text-align: center; font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; }
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: flex-end; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-width: 540px; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); }
+  .modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 16px; }
+  .modal-title { font-size: 17px; font-weight: 600; margin-bottom: 16px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
+  .field input, .field select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 10px 12px; font-size: 15px; color: var(--text); font-family: var(--font); }
+  .field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .color-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+  .color-swatch { width: 32px; height: 32px; border-radius: 8px; cursor: pointer; border: 3px solid transparent; transition: border-color 0.15s; }
+  .color-swatch.sel { border-color: var(--text); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 6px; }
+  .modal-actions button { flex: 1; padding: 13px; border-radius: var(--radius); border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .btn-cancel { background: var(--surface2); color: var(--text2); }
+  .btn-save { background: var(--accent); color: #fff; }
+  .btn-cancel:active, .btn-save:active { opacity: 0.8; }
+  /* EMPTY STATE */
+  .empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 14px; }
+  .empty strong { display: block; font-size: 16px; color: var(--text2); margin-bottom: 6px; }
+  /* PHASE BANNER */
+  .phase-banner { background: var(--accent-bg); border-radius: var(--radius-lg); padding: 12px 14px; margin-bottom: 20px; border: 1px solid rgba(59,124,244,0.15); }
+  .phase-label { font-size: 11px; font-weight: 600; color: var(--accent-text); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .phase-desc { font-size: 13px; color: var(--text2); line-height: 1.4; }
+  /* FAB */
+  .fab { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; width: 52px; height: 52px; border-radius: 50%; background: var(--accent); color: #fff; border: none; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(59,124,244,0.4); z-index: 40; }
+  .fab:active { transform: scale(0.93); }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-title">My Routine</div>
+  <div class="nav-week">
+    <button class="nav-btn" onclick="shiftWeek(-1)">‹</button>
+    <div class="week-label" id="week-label"></div>
+    <button class="nav-btn" onclick="shiftWeek(1)">›</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('day')">Today</button>
+  <button class="tab" onclick="switchTab('week')">Week</button>
+  <button class="tab" onclick="switchTab('habits')">Habits</button>
+</div>
+
+<!-- DAY VIEW -->
+<div class="view active" id="view-day">
+  <div id="day-selector-wrap"></div>
+  <div class="section-head">
+    <div class="section-title" id="day-heading">Today's blocks</div>
+    <button class="add-btn" id="add-block-btn">+ Add block</button>
+  </div>
+  <div class="blocks-list" id="blocks-list"></div>
+</div>
+
+<!-- WEEK VIEW -->
+<div class="view" id="view-week">
+  <div class="stats-grid" id="stats-grid"></div>
+  <div class="phase-banner">
+    <div class="phase-label">Phase 1 — Start here</div>
+    <div class="phase-desc">Add workout right after work and eat dinner by 7 PM this week. Don't worry about the mornings yet.</div>
+  </div>
+  <div class="section-title" style="margin-bottom:12px;">This week at a glance</div>
+  <div id="week-overview"></div>
+</div>
+
+<!-- HABITS VIEW -->
+<div class="view" id="view-habits">
+  <div class="section-head">
+    <div class="section-title">Daily habits</div>
+    <button class="add-btn" onclick="openAddHabit()">+ Add</button>
+  </div>
+  <div id="habits-table"></div>
+</div>
+
+<!-- ADD BLOCK MODAL -->
+<div class="modal-overlay" id="modal-block">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add time block</div>
+    <div class="field"><label>Name</label><input id="b-name" placeholder="e.g. Morning workout" /></div>
+    <div class="field"><label>Time</label><input id="b-time" placeholder="e.g. 7:00 AM" /></div>
+    <div class="field"><label>Color</label><div class="color-grid" id="color-grid"></div></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+      <button class="btn-save" onclick="saveBlock()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD HABIT MODAL -->
+<div class="modal-overlay" id="modal-habit">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add habit</div>
+    <div class="field"><label>Habit name</label><input id="h-name" placeholder="e.g. No phone before breakfast" /></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+      <button class="btn-save" onclick="saveHabit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const COLORS = [
+  { id: 'amber',  bg: '#FAEEDA', dot: '#EF9F27' },
+  { id: 'blue',   bg: '#E6F1FB', dot: '#378ADD' },
+  { id: 'teal',   bg: '#E1F5EE', dot: '#1D9E75' },
+  { id: 'purple', bg: '#EEEDFE', dot: '#7F77DD' },
+  { id: 'coral',  bg: '#FAECE7', dot: '#D85A30' },
+  { id: 'green',  bg: '#EAF3DE', dot: '#639922' },
+  { id: 'pink',   bg: '#FBEAF0', dot: '#D4537E' },
+  { id: 'gray',   bg: '#F1EFE8', dot: '#888780' },
+];
+
+const ROUTINE = [
+  { name: 'Wake up — no phone',     time: '6:45 AM',            color: 'amber',  days: [0,1,2,3,4,5,6] },
+  { name: 'Breakfast',              time: '7:00 AM',            color: 'amber',  days: [0,1,2,3,4,5,6] },
+  { name: 'Work',                   time: '9:00 AM – 5:30 PM',  color: 'blue',   days: [1,2,3,4,5] },
+  { name: 'Shutdown ritual',        time: '5:15 PM',            color: 'blue',   days: [1,2,3,4,5] },
+  { name: 'Workout',                time: '5:45 PM',            color: 'teal',   days: [1,2,3,4,5] },
+  { name: 'Dinner',                 time: '7:00 PM',            color: 'teal',   days: [0,1,2,3,4,5,6] },
+  { name: 'Free time',              time: '8:00 PM',            color: 'purple', days: [0,1,2,3,4,5,6] },
+  { name: 'Wind-down — no screens', time: '9:30 PM',            color: 'purple', days: [0,1,2,3,4,5,6] },
+  { name: 'Sleep',                  time: '10:00 PM',           color: 'gray',   days: [0,1,2,3,4,5,6] },
+];
+
+const DEFAULT_HABITS = [
+  'Eat breakfast',
+  'Workout done',
+  'No screens after 9:30 PM',
+  'In bed by 10 PM',
+  'Shutdown ritual',
+];
+
+const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let state = load();
+let weekOffset = 0;
+let selectedDay = todayKey();
+let selectedColor = 'amber';
+let activeTab = 'day';
+
+function load() {
+  try {
+    const raw = localStorage.getItem('routine_v1');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return buildDefault();
+}
+
+function save() {
+  try { localStorage.setItem('routine_v1', JSON.stringify(state)); } catch(e) {}
+}
+
+function buildDefault() {
+  const blocks = {};
+  const today = new Date();
+  // seed 4 weeks of blocks (2 past, current, 1 future)
+  for (let w = -2; w <= 1; w++) {
+    getWeekDates(w).forEach(d => {
+      const dk = dateKey(d);
+      blocks[dk] = ROUTINE
+        .filter(r => r.days.includes(d.getDay()))
+        .map((r, i) => ({ id: `${dk}-${i}`, name: r.name, time: r.time, color: r.color, done: false }));
+    });
+  }
+  return {
+    blocks,
+    habits: DEFAULT_HABITS.map((name, i) => ({ id: `h${i}`, name })),
+    habitDone: {},
+  };
+}
+
+// ── DATE UTILS ────────────────────────────────────────────────────────
+function todayKey() {
+  return dateKey(new Date());
+}
+
+function dateKey(d) {
+  return d.toISOString().slice(0, 10);
+}
+
+function getWeekDates(offset) {
+  const now = new Date();
+  const day = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1) + offset * 7);
+  return Array.from({length: 7}, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+}
+
+function isToday(d) { return dateKey(d) === todayKey(); }
+
+function fmtDate(d) {
+  return d.toLocaleString('default', { month: 'short', day: 'numeric' });
+}
+
+function ensureBlocks(dk, dayOfWeek) {
+  if (!state.blocks[dk]) {
+    state.blocks[dk] = ROUTINE
+      .filter(r => r.days.includes(dayOfWeek))
+      .map((r, i) => ({ id: `${dk}-${i}`, name: r.name, time: r.time, color: r.color, done: false }));
+    save();
+  }
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────────────
+function colorById(id) { return COLORS.find(c => c.id === id) || COLORS[0]; }
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const tabs = ['day','week','habits'];
+    t.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`view-${tab}`).classList.add('active');
+  render();
+}
+
+function shiftWeek(dir) {
+  weekOffset += dir;
+  const dates = getWeekDates(weekOffset);
+  // keep selectedDay in range
+  const dk0 = dateKey(dates[0]), dk6 = dateKey(dates[6]);
+  if (selectedDay < dk0) selectedDay = dk0;
+  if (selectedDay > dk6) selectedDay = dk6;
+  render();
+}
+
+function closeModals() {
+  document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+}
+
+function openAddBlock() {
+  document.getElementById('b-name').value = '';
+  document.getElementById('b-time').value = '';
+  renderColorGrid();
+  document.getElementById('modal-block').classList.add('open');
+  setTimeout(() => document.getElementById('b-name').focus(), 50);
+}
+
+function openAddHabit() {
+  document.getElementById('h-name').value = '';
+  document.getElementById('modal-habit').classList.add('open');
+  setTimeout(() => document.getElementById('h-name').focus(), 50);
+}
+
+function renderColorGrid() {
+  document.getElementById('color-grid').innerHTML = COLORS.map(c =>
+    `<div class="color-swatch ${c.id === selectedColor ? 'sel' : ''}" style="background:${c.bg};border-color:${c.id===selectedColor?c.dot:'transparent'}"
+      onclick="pickColor('${c.id}')"></div>`
+  ).join('');
+}
+
+function pickColor(id) {
+  selectedColor = id;
+  renderColorGrid();
+}
+
+function saveBlock() {
+  const name = document.getElementById('b-name').value.trim();
+  if (!name) return;
+  const time = document.getElementById('b-time').value.trim();
+  const dk = selectedDay;
+  if (!state.blocks[dk]) state.blocks[dk] = [];
+  state.blocks[dk].push({ id: `custom-${Date.now()}`, name, time, color: selectedColor, done: false });
+  save();
+  closeModals();
+  render();
+}
+
+function saveHabit() {
+  const name = document.getElementById('h-name').value.trim();
+  if (!name) return;
+  state.habits.push({ id: `h${Date.now()}`, name });
+  save();
+  closeModals();
+  render();
+}
+
+function toggleBlock(dk, id) {
+  const b = (state.blocks[dk] || []).find(x => x.id === id);
+  if (b) { b.done = !b.done; save(); render(); }
+}
+
+function toggleHabit(hid, dk) {
+  const k = `${hid}__${dk}`;
+  state.habitDone[k] = !state.habitDone[k];
+  save();
+  render();
+}
+
+function selectDay(dk) {
+  selectedDay = dk;
+  render();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────
+function render() {
+  const dates = getWeekDates(weekOffset);
+  const fmt0 = fmtDate(dates[0]), fmt6 = fmtDate(dates[6]);
+  document.getElementById('week-label').textContent = `${fmt0} – ${fmt6}`;
+
+  if (activeTab === 'day') renderDayView(dates);
+  if (activeTab === 'week') renderWeekView(dates);
+  if (activeTab === 'habits') renderHabitsView(dates);
+}
+
+function renderDayView(dates) {
+  // day selector
+  document.getElementById('day-selector-wrap').innerHTML = `
+    <div class="day-selector">
+      ${dates.map(d => {
+        const dk = dateKey(d);
+        const isActive = dk === selectedDay;
+        const isTod = isToday(d);
+        return `<div class="day-pill ${isActive?'active':''} ${isTod&&!isActive?'today-dot':''}" onclick="selectDay('${dk}')">
+          <span class="d-name">${DAYS_SHORT[d.getDay()]}</span>
+          <span class="d-num">${d.getDate()}</span>
+          ${isTod&&isActive?'<span style="font-size:8px;opacity:0.7">today</span>':''}
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  const selDate = dates.find(d => dateKey(d) === selectedDay) || dates[0];
+  ensureBlocks(selectedDay, selDate.getDay());
+
+  const blocks = state.blocks[selectedDay] || [];
+  const done = blocks.filter(b => b.done).length;
+
+  document.getElementById('day-heading').textContent =
+    isToday(selDate) ? `Today — ${done}/${blocks.length} done` :
+    `${DAYS_SHORT[selDate.getDay()]} ${selDate.getMonth()+1}/${selDate.getDate()} — ${done}/${blocks.length} done`;
+
+  document.getElementById('add-block-btn').onclick = openAddBlock;
+
+  document.getElementById('blocks-list').innerHTML = blocks.length ? blocks.map(b => {
+    const c = colorById(b.color);
+    return `<div class="block-item ${b.done?'done':''}" onclick="toggleBlock('${selectedDay}','${b.id}')">
+      <div class="block-dot" style="background:${c.dot}"></div>
+      <div class="block-info">
+        <div class="block-name">${b.name}</div>
+        ${b.time ? `<div class="block-time">${b.time}</div>` : ''}
+      </div>
+      <div class="block-check"><span class="check-icon">✓</span></div>
+    </div>`;
+  }).join('') : `<div class="empty"><strong>No blocks yet</strong>Tap + Add block to get started.</div>`;
+}
+
+function renderWeekView(dates) {
+  let total=0, done=0, hTotal=0, hDone=0;
+  dates.forEach(d => {
+    const bl = state.blocks[dateKey(d)] || [];
+    total += bl.length; done += bl.filter(b=>b.done).length;
+  });
+  state.habits.forEach(h => {
+    dates.forEach(d => {
+      hTotal++;
+      if (state.habitDone[`${h.id}__${dateKey(d)}`]) hDone++;
+    });
+  });
+  const pct = total ? Math.round(done/total*100) : 0;
+  const hPct = hTotal ? Math.round(hDone/hTotal*100) : 0;
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-val">${done}/${total}</div>
+      <div class="stat-lbl">Blocks completed</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${pct}%</div>
+      <div class="stat-lbl">Completion rate</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${hDone}/${hTotal}</div>
+      <div class="stat-lbl">Habits checked</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${hPct}%"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${hPct}%</div>
+      <div class="stat-lbl">Habit rate</div>
+    </div>`;
+
+  document.getElementById('week-overview').innerHTML = dates.map(d => {
+    const dk = dateKey(d);
+    const bl = state.blocks[dk] || [];
+    const doneCount = bl.filter(b=>b.done).length;
+    const pctD = bl.length ? Math.round(doneCount/bl.length*100) : 0;
+    return `<div style="background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;" onclick="selectDay('${dk}');switchTab('day')">
+      <div style="min-width:40px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;">${DAYS_SHORT[d.getDay()]}</div>
+        <div style="font-size:18px;font-weight:700;color:${isToday(d)?'var(--accent)':'var(--text)'};">${d.getDate()}</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:5px;">${doneCount}/${bl.length} blocks</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pctD}%"></div></div>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:${pctD>=70?'var(--success)':pctD>=40?'var(--accent)':'var(--text3)'};">${pctD}%</div>
+    </div>`;
+  }).join('');
+}
+
+function renderHabitsView(dates) {
+  if (!state.habits.length) {
+    document.getElementById('habits-table').innerHTML = `<div class="empty"><strong>No habits yet</strong>Add your first daily habit above.</div>`;
+    return;
+  }
+  document.getElementById('habits-table').innerHTML = `
+    <div class="habit-table">
+      <div class="habit-head">
+        <div class="habit-head-name">Habit</div>
+        <div class="habit-day-labels">
+          ${dates.map(d => `<div class="h-day-lbl">${DAYS_SHORT[d.getDay()][0]}</div>`).join('')}
+        </div>
+        <div style="min-width:30px"></div>
+      </div>
+      ${state.habits.map(h => {
+        const doneDays = dates.filter(d => state.habitDone[`${h.id}__${dateKey(d)}`]).length;
+        const pct = Math.round(doneDays/7*100);
+        return `<div class="habit-row">
+          <div class="habit-name">${h.name}</div>
+          <div class="habit-days">
+            ${dates.map(d => {
+              const dk = dateKey(d);
+              const done = state.habitDone[`${h.id}__${dk}`];
+              return `<div class="h-dot ${done?'done':''}" onclick="toggleHabit('${h.id}','${dk}')">${done?'✓':''}</div>`;
+            }).join('')}
+          </div>
+          <div class="habit-pct">${pct}%</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+document.querySelectorAll('.modal-overlay').forEach(m =>
+  m.addEventListener('click', e => { if (e.target === m) closeModals(); })
+);
+
+// set selectedDay to today
+selectedDay = todayKey();
+// ensure today's blocks exist
+const todayDate = new Date();
+ensureBlocks(todayKey(), todayDate.getDay());
+
+render();
+</script>
+</body>
+</html>

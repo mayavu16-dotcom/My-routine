@@ -294,17 +294,6 @@ body {
 .block-note-bullets li { padding: 1px 0; padding-left: 14px; position: relative; }
 .block-note-bullets li::before { content: '•'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
 /* ── NOTE FIELD IN MODAL ── */
-.block-item.overdue { border-color: var(--warning, #d97706); }
-.block-item.overdue .block-time { color: var(--warning, #d97706); }
-.overdue-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--warning, #d97706); flex-shrink: 0;
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.85); }
-}
 .note-field-wrap { position: relative; }
 .note-field-wrap textarea {
   width: 100%; background: var(--surface2); border: 1px solid var(--border2);
@@ -1921,21 +1910,6 @@ function renderDay(dates) {
         const hasBottom = hasNotes || noteOpen;
         const blockRadius = hasBottom ? 'var(--radius) var(--radius) 0 0' : 'var(--radius)';
 
-        // overdue: today, not done, has a time that has passed
-        let isOverdue = false;
-        if (isToday(selDate) && !b.done && b.time) {
-          const match = b.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
-          if (match) {
-            let hr = parseInt(match[1]), mn = parseInt(match[2]);
-            const pm = match[3].toUpperCase() === 'PM';
-            if (pm && hr !== 12) hr += 12;
-            if (!pm && hr === 12) hr = 0;
-            const blockMins = hr * 60 + mn;
-            const nowMins = new Date().getHours() * 60 + new Date().getMinutes();
-            isOverdue = nowMins > blockMins + 15; // 15 min grace
-          }
-        }
-
         // bullet note display (when panel is closed but notes exist)
         const bulletHTML = (hasNotes && !noteOpen) ? `<div class="block-note-row">
           <ul class="block-note-bullets">${b.notes.map(n=>`<li>${n}</li>`).join('')}</ul>
@@ -1965,7 +1939,7 @@ function renderDay(dates) {
         </div>` : '';
 
         return `<div style="margin-bottom:8px;">
-          <div class="block-item ${b.done?'done':''} ${isOverdue?'overdue':''}" id="bi-${b.id}"
+          <div class="block-item ${b.done?'done':''}" id="bi-${b.id}"
             style="border-radius:${blockRadius};margin-bottom:0;"
             draggable="true"
             ondragstart="onDragStart(event,'${b.id}')"
@@ -1982,10 +1956,9 @@ function renderDay(dates) {
             <div class="block-emoji" onclick="toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.emoji||'🎯'}</div>
             <div class="block-info" onclick="toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">
               <div class="block-name">${b.name}</div>
-              ${b.time?`<div class="block-time">${b.time}${isOverdue?' — overdue':''}</div>`:''}
+              ${b.time?`<div class="block-time">${b.time}</div>`:''}
             </div>
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;">
-              ${isOverdue?'<div class="overdue-dot"></div>':''}
               <button class="note-icon-btn ${hasNotes?'has-note':''}" onclick="event.stopPropagation();toggleNotePanel('${selectedDay}','${b.id}')" title="${noteOpen?'Close note':'Add note'}">📝</button>
               <button class="block-edit-btn" onclick="event.stopPropagation();openEditBlock('${selectedDay}','${b.id}')" title="Edit">✎</button>
               <div class="block-check" style="border-color:${b.done?'':c.dot}" onclick="event.stopPropagation();toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.done?'✓':''}</div>

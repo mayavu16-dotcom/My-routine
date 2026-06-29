@@ -9,23 +9,26 @@
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)" />
 <title>My Routine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital@0;1&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f6f6f4;
+  --bg: #f5f3ef;
   --surface: #ffffff;
-  --surface2: #f0efec;
-  --surface3: #e8e7e3;
-  --text: #1a1a18;
-  --text2: #6b6b67;
-  --text3: #a0a09b;
+  --surface2: #f0ede8;
+  --surface3: #e8e4de;
+  --text: #18170f;
+  --text2: #5c5a52;
+  --text3: #9e9b92;
   --border: rgba(0,0,0,0.07);
-  --border2: rgba(0,0,0,0.12);
-  --accent: #3b7cf4;
-  --accent-bg: #eef3fe;
-  --accent-text: #1a4fb5;
-  --success: #16a362;
-  --success-bg: #e6f7ef;
-  --success-text: #0a6b3f;
+  --border2: rgba(0,0,0,0.13);
+  --accent: #4f6ef7;
+  --accent-bg: #edf0ff;
+  --accent-text: #2740c8;
+  --success: #1a9e65;
+  --success-bg: #e4f7ee;
+  --success-text: #0c6840;
   --warning: #d97706;
   --warning-bg: #fef3e2;
   --danger: #e53e3e;
@@ -33,7 +36,8 @@
   --streak-bg: #fff4ed;
   --radius: 12px;
   --radius-lg: 18px;
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Lora', Georgia, serif;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
 }
@@ -118,6 +122,7 @@ body {
   color: var(--text);
   min-height: 100dvh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ── NAV ── */
@@ -129,7 +134,7 @@ body {
   display: flex; align-items: center; justify-content: space-between;
 }
 .nav-left { display: flex; align-items: center; gap: 10px; }
-.nav-title { font-size: 18px; font-weight: 700; letter-spacing: -0.4px; }
+.nav-title { font-size: 20px; font-weight: 800; letter-spacing: -0.6px; color: var(--text); }
 .streak-pill {
   display: flex; align-items: center; gap: 4px;
   background: var(--streak-bg); color: var(--streak);
@@ -151,7 +156,7 @@ body {
   position: sticky; top: 56px; z-index: 99;
 }
 .tab {
-  flex: 1; padding: 10px 0; font-size: 13px; font-weight: 500;
+  flex: 1; padding: 11px 0; font-size: 13px; font-weight: 600;
   color: var(--text3); border: none; background: none; cursor: pointer;
   border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
 }
@@ -162,12 +167,56 @@ body {
 .view.active { display: block; }
 
 /* ── RING ── */
-.ring-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; background: var(--surface); border-radius: var(--radius-lg); padding: 16px; border: 1px solid var(--border); }
+.ring-wrap { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; background: var(--surface); border-radius: var(--radius-lg); padding: 18px; border: 1px solid var(--border); }
 .ring-svg { flex-shrink: 0; }
 .ring-info { flex: 1; }
-.ring-pct { font-size: 32px; font-weight: 800; letter-spacing: -1px; color: var(--text); }
-.ring-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.ring-pct { font-size: 36px; font-weight: 800; letter-spacing: -1.5px; color: var(--text); }
+.ring-sub { font-size: 13px; color: var(--text3); margin-top: 3px; letter-spacing: 0.01em; }
 .ring-msg { font-size: 13px; font-weight: 500; margin-top: 8px; padding: 6px 10px; border-radius: 8px; }
+.verse-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 18px;
+  margin-bottom: 16px; border-left: 3px solid var(--accent);
+}
+.verse-text {
+  font-size: 15px; color: var(--text); line-height: 1.75;
+  font-family: var(--font-serif); font-style: italic; font-weight: 600;
+  margin-bottom: 8px; letter-spacing: 0.01em;
+}
+.verse-ref {
+  font-size: 12px; font-weight: 700; color: var(--accent);
+  text-align: right; letter-spacing: 0.06em; text-transform: uppercase;
+  font-family: var(--font);
+}
+/* ── COLOR PICKER FLYOUT ── */
+.color-flyout {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 16px; padding: 14px; z-index: 200;
+  display: none; flex-direction: column; gap: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  min-width: 220px;
+}
+.color-flyout.open { display: flex; }
+.color-flyout-label { font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text3); margin-bottom: 2px; }
+.accent-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.accent-swatch {
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+  border: 3px solid transparent; transition: transform 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.accent-swatch:hover { transform: scale(1.1); }
+.accent-swatch.sel { border-color: var(--text); transform: scale(1.12); }
+.color-picker-wrap { position: relative; }
+.palette-btn {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 8px; width: 30px; height: 30px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: background 0.15s;
+}
+.palette-btn:hover { background: var(--surface3); }
+.palette-btn:active { opacity: 0.7; }
 
 /* ── NOW CARD ── */
 .now-card {
@@ -177,15 +226,15 @@ body {
 }
 .now-icon { font-size: 28px; flex-shrink: 0; }
 .now-info { flex: 1; }
-.now-label { font-size: 11px; font-weight: 600; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.06em; }
-.now-name { font-size: 17px; font-weight: 700; margin-top: 1px; }
+.now-label { font-size: 10px; font-weight: 700; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.12em; }
+.now-name { font-size: 18px; font-weight: 800; margin-top: 2px; letter-spacing: -0.3px; }
 .now-time { font-size: 12px; opacity: 0.8; margin-top: 1px; }
 .now-check { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.25); border: none; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .now-check:active { transform: scale(0.9); }
 
 /* ── SECTION ── */
 .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; margin-top: 4px; }
-.section-title { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; }
+.section-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; }
 .add-btn { background: var(--accent-bg); color: var(--accent-text); border: none; border-radius: 8px; padding: 5px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
 .add-btn:active { opacity: 0.7; }
 .trash-btn { background: transparent; border: 0.5px solid var(--border2); border-radius: 8px; padding: 5px 9px; font-size: 15px; cursor: pointer; color: var(--text2); transition: background 0.15s; }
@@ -224,9 +273,9 @@ body {
 .drag-handle span { display: block; width: 14px; height: 2px; background: var(--text3); border-radius: 1px; }
 .block-emoji { font-size: 20px; flex-shrink: 0; width: 32px; text-align: center; }
 .block-info { flex: 1; min-width: 0; }
-.block-name { font-size: 15px; font-weight: 500; color: var(--text); }
+.block-name { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.1px; }
 .block-item.done .block-name { text-decoration: line-through; color: var(--text3); }
-.block-time { font-size: 12px; color: var(--text3); margin-top: 1px; }
+.block-time { font-size: 11px; color: var(--text3); margin-top: 2px; letter-spacing: 0.02em; text-transform: uppercase; font-weight: 500; }
 .block-check {
   width: 24px; height: 24px; border-radius: 50%;
   border: 1.5px solid var(--border2); display: flex; align-items: center;
@@ -265,9 +314,9 @@ body {
   transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 0px;
   min-width: 48px;
 }
-.day-pill .d-name { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; }
-.day-pill .d-num { font-size: 16px; font-weight: 700; line-height: 1.2; }
-.day-pill .d-mon { font-size: 10px; font-weight: 500; color: var(--text3); line-height: 1.2; }
+.day-pill .d-name { font-size: 9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+.day-pill .d-num { font-size: 17px; font-weight: 800; line-height: 1.15; letter-spacing: -0.3px; }
+.day-pill .d-mon { font-size: 9px; font-weight: 500; color: var(--text3); line-height: 1.2; opacity: 0.8; }
 .day-pill .d-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-top: 3px; }
 .day-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .day-pill.active .d-name { color: rgba(255,255,255,0.7); }
@@ -279,7 +328,7 @@ body {
 /* ── STATS GRID ── */
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
 .stat-card { background: var(--surface); border-radius: var(--radius-lg); padding: 14px 16px; border: 1px solid var(--border); }
-.stat-val { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+.stat-val { font-size: 30px; font-weight: 800; letter-spacing: -1px; color: var(--text); }
 .stat-lbl { font-size: 12px; color: var(--text3); margin-top: 2px; }
 .progress-bar { height: 3px; background: var(--surface2); border-radius: 2px; margin-top: 10px; overflow: hidden; }
 .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.5s ease; }
@@ -371,13 +420,24 @@ body {
 /* ── MODAL ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; justify-content: center; }
 .modal-overlay.open { display: flex; }
-.modal { background: var(--surface); border-radius: 22px 22px 0 0; width: 100%; max-width: 540px; padding: 20px 20px calc(20px + var(--safe-bottom)); }
+.modal {
+  background: var(--surface); border-radius: 22px 22px 0 0;
+  width: 100%; max-width: 540px;
+  padding: 20px 20px calc(20px + var(--safe-bottom));
+  max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain;
+}
+@media (min-width: 600px) {
+  .modal-overlay { align-items: center; padding: 20px; }
+  .modal { border-radius: 20px; max-height: 85dvh; padding: 28px; }
+}
 .modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 16px; }
-.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+@media (min-width: 600px) { .modal-handle { display: none; } }
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
 .field { margin-bottom: 14px; }
 .field label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
 .field input, .field select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 11px 12px; font-size: 15px; color: var(--text); font-family: var(--font); }
 .field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+.modal-row-pair { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 4px; }
 .emoji-grid { display: flex; gap: 8px; flex-wrap: wrap; }
 .emoji-opt { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--border2); background: var(--surface2); cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
 .emoji-opt.sel { border-color: var(--accent); background: var(--accent-bg); }
@@ -417,26 +477,30 @@ body {
 .emoji-recent-item:active { transform: scale(0.88); }
 .emoji-recent-item.sel { border-color: var(--accent); background: var(--accent-bg); }
 .color-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-.color-swatch { width: 32px; height: 32px; border-radius: 8px; cursor: pointer; border: 3px solid transparent; transition: border-color 0.15s, transform 0.1s; }
+.color-grid.col { flex-direction: row; flex-wrap: wrap; max-width: 80px; }
+.color-swatch { width: 32px; height: 32px; border-radius: 8px; cursor: pointer; border: 3px solid transparent; transition: border-color 0.15s, transform 0.1s; flex-shrink: 0; }
 .color-swatch.sel { border-color: var(--text); transform: scale(1.1); }
-.modal-actions { display: flex; gap: 10px; margin-top: 8px; }
-.modal-actions button { flex: 1; padding: 14px; border-radius: var(--radius); border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
-.btn-cancel { background: var(--surface2); color: var(--text2); }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.modal-actions button { flex: 1; padding: 14px; border-radius: var(--radius); border: 1.5px solid transparent; font-size: 15px; font-weight: 600; cursor: pointer; }
+.btn-cancel { background: var(--surface2); color: var(--text2); border-color: var(--border2); }
 .btn-save { background: var(--accent); color: #fff; }
 .btn-cancel:active, .btn-save:active { opacity: 0.75; }
 .btn-delete {
-  background: var(--danger-soft, #fee2e2);
-  color: var(--danger-text, #b91c1c);
-  border: 1px solid var(--danger-border, #fca5a5);
+  background: transparent; color: #dc2626;
+  border: 1.5px solid #dc2626;
   border-radius: var(--radius); padding: 13px;
   font-size: 15px; font-weight: 600; cursor: pointer; flex: 1;
 }
+.btn-delete:hover { background: #fee2e2; }
 .btn-delete:active { opacity: 0.75; }
 @media (prefers-color-scheme: dark) {
-  .btn-delete { background: #2d0f0f; color: #f87171; border-color: #7f1d1d; }
+  .btn-delete { color: #f87171; border-color: #f87171; background: transparent; }
+  .btn-delete:hover { background: #2d0f0f; }
 }
-[data-theme="dark"] .btn-delete { background: #2d0f0f; color: #f87171; border-color: #7f1d1d; }
-[data-theme="light"] .btn-delete { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+[data-theme="dark"] .btn-delete { color: #f87171; border-color: #f87171; background: transparent; }
+[data-theme="dark"] .btn-delete:hover { background: #2d0f0f; }
+[data-theme="light"] .btn-delete { color: #dc2626; border-color: #dc2626; background: transparent; }
+[data-theme="light"] .btn-delete:hover { background: #fee2e2; }
 /* ── INLINE NOTE ── */
 .note-panel {
   background: var(--surface2); border: 1px solid var(--border);
@@ -447,13 +511,39 @@ body {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.note-panel textarea {
-  width: 100%; background: var(--surface); border: 1px solid var(--border2);
-  border-radius: 8px; padding: 9px 11px; font-size: 13px; color: var(--text);
-  font-family: var(--font); resize: none; min-height: 80px; line-height: 1.6;
+.bullet-editor {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 6px 0; min-height: 72px;
 }
-.note-panel textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
-.note-panel-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 7px; gap: 8px; }
+.bullet-editor:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+.bullet-line {
+  display: flex; align-items: flex-start; gap: 6px;
+  padding: 3px 10px;
+}
+.bullet-line-dot {
+  color: var(--accent); font-size: 16px; font-weight: 700;
+  flex-shrink: 0; line-height: 1.5; margin-top: 1px; user-select: none;
+}
+.bullet-line input {
+  flex: 1; border: none; background: transparent; font-size: 13px;
+  color: var(--text); font-family: var(--font); line-height: 1.5;
+  padding: 2px 0; outline: none;
+}
+.bullet-line input::placeholder { color: var(--text3); }
+.bullet-line-del {
+  background: none; border: none; color: var(--text3); cursor: pointer;
+  font-size: 14px; padding: 2px 4px; border-radius: 4px; opacity: 0;
+  transition: opacity 0.15s; line-height: 1.5;
+}
+.bullet-line:hover .bullet-line-del { opacity: 1; }
+.bullet-line-del:active { opacity: 0.5; }
+.note-add-line {
+  display: flex; align-items: center; gap: 6px; padding: 2px 10px 4px;
+  color: var(--text3); font-size: 12px; cursor: pointer; border: none;
+  background: none; width: 100%; text-align: left;
+}
+.note-add-line:hover { color: var(--accent); }
+.note-panel-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 8px; }
 .note-panel-hint { font-size: 11px; color: var(--text3); }
 .note-save-btn { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
 .note-save-btn:active { opacity: 0.8; }
@@ -585,6 +675,13 @@ body {
     <div class="streak-pill" id="streak-pill">🔥 0</div>
   </div>
   <div class="nav-week">
+    <div class="color-picker-wrap">
+      <button class="palette-btn" onclick="toggleColorFlyout()" title="Change accent color">🎨</button>
+      <div class="color-flyout" id="color-flyout">
+        <div class="color-flyout-label">Accent color</div>
+        <div class="accent-swatches" id="accent-swatches"></div>
+      </div>
+    </div>
     <button class="nav-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark mode" style="font-size:18px;">🌙</button>
     <button class="nav-btn" onclick="shiftWeek(-1)">‹</button>
     <div class="week-label" id="week-label"></div>
@@ -641,37 +738,46 @@ body {
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title" id="modal-block-title">Add time block</div>
+
     <div class="field"><label>Name</label><input id="b-name" placeholder="e.g. Morning workout" /></div>
+
     <div class="field">
       <label>Time <span id="time-display" style="color:var(--accent);font-weight:600;margin-left:6px"></span></label>
-      <div class="time-picker" id="time-picker">
+      <div class="time-picker" id="time-picker" style="height:132px;">
         <div class="tp-selector"></div>
         <div class="tp-col" id="tp-hour"></div>
         <div class="tp-col" id="tp-min"></div>
         <div class="tp-col" id="tp-ampm"></div>
       </div>
     </div>
-    <div class="field">
-      <label>Icon</label>
-      <div class="emoji-picker-wrap">
-        <div class="emoji-preview-row">
-          <div class="emoji-preview has-emoji" id="emoji-preview">☀️</div>
-          <button class="emoji-tap-btn" onclick="openNativeEmoji()">
-            Tap to pick any emoji<br><span style="font-size:12px;opacity:0.7">opens your emoji keyboard</span>
-          </button>
-        </div>
-        <div class="emoji-input-wrap">
-          <span class="emoji-input-hint">🔍</span>
-          <input id="emoji-input" placeholder="  or type / paste an emoji here" maxlength="8"
-            oninput="onEmojiInput(this.value)" autocomplete="off" autocorrect="off" />
-        </div>
-        <div id="emoji-recents-wrap" style="display:none">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Recent</div>
-          <div class="emoji-recents" id="emoji-recents"></div>
+
+    <div class="modal-row-pair">
+      <div class="field" style="flex:1;min-width:0;">
+        <label>Icon</label>
+        <div class="emoji-picker-wrap">
+          <div class="emoji-preview-row">
+            <div class="emoji-preview has-emoji" id="emoji-preview">☀️</div>
+            <button class="emoji-tap-btn" onclick="openNativeEmoji()" style="padding:8px;font-size:13px;">
+              Tap to pick<br><span style="font-size:11px;opacity:0.7">opens emoji keyboard</span>
+            </button>
+          </div>
+          <div class="emoji-input-wrap" style="margin-top:8px;">
+            <span class="emoji-input-hint">🔍</span>
+            <input id="emoji-input" placeholder="  paste emoji" maxlength="8"
+              oninput="onEmojiInput(this.value)" autocomplete="off" autocorrect="off" style="font-size:18px;padding:8px 10px 8px 34px;" />
+          </div>
+          <div id="emoji-recents-wrap" style="display:none;margin-top:8px;">
+            <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Recent</div>
+            <div class="emoji-recents" id="emoji-recents"></div>
+          </div>
         </div>
       </div>
+      <div class="field" style="flex:0 0 auto;">
+        <label>Color</label>
+        <div class="color-grid" id="color-grid" style="flex-direction:column;gap:6px;"></div>
+      </div>
     </div>
-    <div class="field"><label>Color</label><div class="color-grid" id="color-grid"></div></div>
+
     <div class="modal-actions" id="modal-block-actions">
       <button class="btn-cancel" onclick="closeModals()">Cancel</button>
       <button class="btn-save" onclick="saveBlock()">Save</button>
@@ -783,13 +889,261 @@ const ROUTINE = [
 
 const DEFAULT_HABITS = ['Eat breakfast','Workout done','No screens after 9:30 PM','In bed by 10 PM','Shutdown ritual'];
 
-const MESSAGES = {
-  0:  ["Today's a clean slate — let's go.", "Every routine starts with one check.", "Small steps, big change."],
-  25: ["Good start! Keep the momentum.", "One block at a time.", "You're moving — don't stop now."],
-  50: ["Halfway there, keep pushing.", "More done than not. That's a win.", "Past the halfway point — finish strong."],
-  75: ["Almost there, don't quit now!", "So close to a perfect day.", "Three quarters done — finish it."],
-  100:["Perfect day. You crushed it! 🎉", "Full routine complete. That's a streak.", "100%! You showed up for yourself today."]
-};
+const KJV_VERSES = [
+  {text:"For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end.",ref:"Jeremiah 29:11"},
+  {text:"The LORD is my shepherd; I shall not want.",ref:"Psalm 23:1"},
+  {text:"I can do all things through Christ which strengtheneth me.",ref:"Philippians 4:13"},
+  {text:"Trust in the LORD with all thine heart; and lean not unto thine own understanding.",ref:"Proverbs 3:5"},
+  {text:"Be strong and courageous. Do not be afraid; do not be discouraged, for the LORD your God will be with you wherever you go.",ref:"Joshua 1:9"},
+  {text:"And we know that all things work together for good to them that love God.",ref:"Romans 8:28"},
+  {text:"But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles.",ref:"Isaiah 40:31"},
+  {text:"For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.",ref:"John 3:16"},
+  {text:"The LORD is my light and my salvation; whom shall I fear?",ref:"Psalm 27:1"},
+  {text:"Come unto me, all ye that labour and are heavy laden, and I will give you rest.",ref:"Matthew 11:28"},
+  {text:"Cast thy burden upon the LORD, and he shall sustain thee.",ref:"Psalm 55:22"},
+  {text:"Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee.",ref:"Isaiah 41:10"},
+  {text:"The LORD bless thee, and keep thee: The LORD make his face shine upon thee, and be gracious unto thee.",ref:"Numbers 6:24-25"},
+  {text:"Create in me a clean heart, O God; and renew a right spirit within me.",ref:"Psalm 51:10"},
+  {text:"Thy word is a lamp unto my feet, and a light unto my path.",ref:"Psalm 119:105"},
+  {text:"In all thy ways acknowledge him, and he shall direct thy paths.",ref:"Proverbs 3:6"},
+  {text:"Let your light so shine before men, that they may see your good works.",ref:"Matthew 5:16"},
+  {text:"The joy of the LORD is your strength.",ref:"Nehemiah 8:10"},
+  {text:"Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you.",ref:"John 14:27"},
+  {text:"Be still, and know that I am God.",ref:"Psalm 46:10"},
+  {text:"Delight thyself also in the LORD: and he shall give thee the desires of thine heart.",ref:"Psalm 37:4"},
+  {text:"If any of you lack wisdom, let him ask of God, that giveth to all men liberally.",ref:"James 1:5"},
+  {text:"Now faith is the substance of things hoped for, the evidence of things not seen.",ref:"Hebrews 11:1"},
+  {text:"Love is patient, love is kind; it is not jealous, it does not boast, it is not arrogant.",ref:"1 Corinthians 13:4"},
+  {text:"The name of the LORD is a strong tower: the righteous runneth into it, and is safe.",ref:"Proverbs 18:10"},
+  {text:"Commit thy works unto the LORD, and thy thoughts shall be established.",ref:"Proverbs 16:3"},
+  {text:"Blessed are the pure in heart: for they shall see God.",ref:"Matthew 5:8"},
+  {text:"He hath made every thing beautiful in his time.",ref:"Ecclesiastes 3:11"},
+  {text:"The LORD is nigh unto all them that call upon him, to all that call upon him in truth.",ref:"Psalm 145:18"},
+  {text:"With God all things are possible.",ref:"Matthew 19:26"},
+  {text:"Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed.",ref:"Joshua 1:9"},
+  {text:"For the LORD God is a sun and shield: the LORD will give grace and glory.",ref:"Psalm 84:11"},
+  {text:"Seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.",ref:"Matthew 6:33"},
+  {text:"The heart of man plans his way, but the LORD establishes his steps.",ref:"Proverbs 16:9"},
+  {text:"Blessed is the man that trusteth in the LORD, and whose hope the LORD is.",ref:"Jeremiah 17:7"},
+  {text:"Not by might, nor by power, but by my spirit, saith the LORD of hosts.",ref:"Zechariah 4:6"},
+  {text:"I will lift up mine eyes unto the hills, from whence cometh my help.",ref:"Psalm 121:1"},
+  {text:"My help cometh from the LORD, which made heaven and earth.",ref:"Psalm 121:2"},
+  {text:"This is the day which the LORD hath made; we will rejoice and be glad in it.",ref:"Psalm 118:24"},
+  {text:"Rejoice in the Lord always: and again I say, Rejoice.",ref:"Philippians 4:4"},
+  {text:"Be anxious for nothing; but in every thing by prayer and supplication with thanksgiving.",ref:"Philippians 4:6"},
+  {text:"And the peace of God, which passeth all understanding, shall keep your hearts and minds.",ref:"Philippians 4:7"},
+  {text:"I have learned, in whatsoever state I am, therewith to be content.",ref:"Philippians 4:11"},
+  {text:"My grace is sufficient for thee: for my strength is made perfect in weakness.",ref:"2 Corinthians 12:9"},
+  {text:"There is no fear in love; but perfect love casteth out fear.",ref:"1 John 4:18"},
+  {text:"God is our refuge and strength, a very present help in trouble.",ref:"Psalm 46:1"},
+  {text:"The LORD is good, a strong hold in the day of trouble.",ref:"Nahum 1:7"},
+  {text:"He giveth power to the faint; and to them that have no might he increaseth strength.",ref:"Isaiah 40:29"},
+  {text:"Blessed are they that mourn: for they shall be comforted.",ref:"Matthew 5:4"},
+  {text:"The LORD is close to the brokenhearted and saves those who are crushed in spirit.",ref:"Psalm 34:18"},
+  {text:"For I am the LORD thy God who takes hold of thy right hand and says, Fear not; I will help thee.",ref:"Isaiah 41:13"},
+  {text:"Humble yourselves therefore under the mighty hand of God, that he may exalt you in due time.",ref:"1 Peter 5:6"},
+  {text:"Casting all your care upon him; for he careth for you.",ref:"1 Peter 5:7"},
+  {text:"For the wages of sin is death; but the gift of God is eternal life.",ref:"Romans 6:23"},
+  {text:"There is therefore now no condemnation to them which are in Christ Jesus.",ref:"Romans 8:1"},
+  {text:"The LORD is my strength and my shield; my heart trusted in him, and I am helped.",ref:"Psalm 28:7"},
+  {text:"Whatsoever things are true, whatsoever things are honest… think on these things.",ref:"Philippians 4:8"},
+  {text:"I have set the LORD always before me: because he is at my right hand, I shall not be moved.",ref:"Psalm 16:8"},
+  {text:"For thine is the kingdom, and the power, and the glory, for ever.",ref:"Matthew 6:13"},
+  {text:"Thy kingdom come. Thy will be done in earth, as it is in heaven.",ref:"Matthew 6:10"},
+  {text:"Give us this day our daily bread.",ref:"Matthew 6:11"},
+  {text:"Ask, and it shall be given you; seek, and ye shall find; knock, and it shall be opened unto you.",ref:"Matthew 7:7"},
+  {text:"Enter ye in at the strait gate… because strait is the gate, and narrow is the way, which leadeth unto life.",ref:"Matthew 7:13-14"},
+  {text:"For every one that asketh receiveth; and he that seeketh findeth.",ref:"Matthew 7:8"},
+  {text:"Blessed are the meek: for they shall inherit the earth.",ref:"Matthew 5:5"},
+  {text:"Blessed are the merciful: for they shall obtain mercy.",ref:"Matthew 5:7"},
+  {text:"Blessed are the peacemakers: for they shall be called the children of God.",ref:"Matthew 5:9"},
+  {text:"But seek ye first the kingdom of God, and his righteousness.",ref:"Matthew 6:33"},
+  {text:"No man can serve two masters… Ye cannot serve God and mammon.",ref:"Matthew 6:24"},
+  {text:"Take therefore no thought for the morrow: for the morrow shall take thought for the things of itself.",ref:"Matthew 6:34"},
+  {text:"Judge not, that ye be not judged.",ref:"Matthew 7:1"},
+  {text:"Therefore all things whatsoever ye would that men should do to you, do ye even so to them.",ref:"Matthew 7:12"},
+  {text:"The LORD shall preserve thy going out and thy coming in from this time forth.",ref:"Psalm 121:8"},
+  {text:"He that dwelleth in the secret place of the most High shall abide under the shadow of the Almighty.",ref:"Psalm 91:1"},
+  {text:"For he shall give his angels charge over thee, to keep thee in all thy ways.",ref:"Psalm 91:11"},
+  {text:"O give thanks unto the LORD; for he is good: for his mercy endureth for ever.",ref:"Psalm 136:1"},
+  {text:"The LORD upholdeth all that fall, and raiseth up all those that be bowed down.",ref:"Psalm 145:14"},
+  {text:"Great is the LORD, and greatly to be praised; and his greatness is unsearchable.",ref:"Psalm 145:3"},
+  {text:"The LORD is gracious, and full of compassion; slow to anger, and of great mercy.",ref:"Psalm 145:8"},
+  {text:"The LORD preserveth all them that love him.",ref:"Psalm 145:20"},
+  {text:"Praise ye the LORD. Praise God in his sanctuary: praise him in the firmament of his power.",ref:"Psalm 150:1"},
+  {text:"Let every thing that hath breath praise the LORD.",ref:"Psalm 150:6"},
+  {text:"To every thing there is a season, and a time to every purpose under the heaven.",ref:"Ecclesiastes 3:1"},
+  {text:"Two are better than one; because they have a good reward for their labour.",ref:"Ecclesiastes 4:9"},
+  {text:"Whatever you do, work at it with all your heart, as working for the Lord.",ref:"Colossians 3:23"},
+  {text:"Let the word of Christ dwell in you richly in all wisdom.",ref:"Colossians 3:16"},
+  {text:"And whatsoever ye do in word or deed, do all in the name of the Lord Jesus.",ref:"Colossians 3:17"},
+  {text:"Put on therefore, as the elect of God, holy and beloved, bowels of mercies, kindness, humbleness of mind.",ref:"Colossians 3:12"},
+  {text:"Let the peace of God rule in your hearts.",ref:"Colossians 3:15"},
+  {text:"And above all these things put on charity, which is the bond of perfectness.",ref:"Colossians 3:14"},
+  {text:"This book of the law shall not depart out of thy mouth; but thou shalt meditate therein day and night.",ref:"Joshua 1:8"},
+  {text:"The LORD your God is in your midst, a mighty one who will save.",ref:"Zephaniah 3:17"},
+  {text:"He will rejoice over thee with joy; he will rest in his love; he will joy over thee with singing.",ref:"Zephaniah 3:17"},
+  {text:"Call unto me, and I will answer thee, and show thee great and mighty things.",ref:"Jeremiah 33:3"},
+  {text:"For I will restore health unto thee, and I will heal thee of thy wounds, saith the LORD.",ref:"Jeremiah 30:17"},
+  {text:"Before I formed thee in the belly I knew thee; and before thou camest forth… I sanctified thee.",ref:"Jeremiah 1:5"},
+  {text:"For the eyes of the LORD run to and fro throughout the whole earth, to shew himself strong.",ref:"2 Chronicles 16:9"},
+  {text:"If my people, which are called by my name, shall humble themselves, and pray… then will I hear from heaven.",ref:"2 Chronicles 7:14"},
+  {text:"The LORD is my rock, and my fortress, and my deliverer; my God, my strength, in whom I will trust.",ref:"Psalm 18:2"},
+  {text:"He maketh me to lie down in green pastures: he leadeth me beside the still waters.",ref:"Psalm 23:2"},
+  {text:"Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me.",ref:"Psalm 23:4"},
+  {text:"Surely goodness and mercy shall follow me all the days of my life.",ref:"Psalm 23:6"},
+  {text:"The earth is the LORD's, and the fulness thereof; the world, and they that dwell therein.",ref:"Psalm 24:1"},
+  {text:"The LORD is my shepherd; I shall not want. He maketh me to lie down in green pastures.",ref:"Psalm 23:1-2"},
+  {text:"Weeping may endure for a night, but joy cometh in the morning.",ref:"Psalm 30:5"},
+  {text:"Taste and see that the LORD is good: blessed is the man that trusteth in him.",ref:"Psalm 34:8"},
+  {text:"The LORD redeemeth the soul of his servants: and none of them that trust in him shall be desolate.",ref:"Psalm 34:22"},
+  {text:"Fret not thyself because of evildoers.",ref:"Psalm 37:1"},
+  {text:"Rest in the LORD, and wait patiently for him.",ref:"Psalm 37:7"},
+  {text:"The steps of a good man are ordered by the LORD: and he delighteth in his way.",ref:"Psalm 37:23"},
+  {text:"Though he fall, he shall not be utterly cast down: for the LORD upholdeth him with his hand.",ref:"Psalm 37:24"},
+  {text:"As the hart panteth after the water brooks, so panteth my soul after thee, O God.",ref:"Psalm 42:1"},
+  {text:"Why art thou cast down, O my soul?… hope thou in God.",ref:"Psalm 42:5"},
+  {text:"God is our refuge and strength, a very present help in trouble.",ref:"Psalm 46:1"},
+  {text:"The LORD of hosts is with us; the God of Jacob is our refuge.",ref:"Psalm 46:7"},
+  {text:"Have mercy upon me, O God, according to thy lovingkindness.",ref:"Psalm 51:1"},
+  {text:"Restore unto me the joy of thy salvation; and uphold me with thy free spirit.",ref:"Psalm 51:12"},
+  {text:"He only is my rock and my salvation; he is my defence; I shall not be moved.",ref:"Psalm 62:6"},
+  {text:"O God, thou art my God; early will I seek thee: my soul thirsteth for thee.",ref:"Psalm 63:1"},
+  {text:"Make a joyful noise unto God, all ye lands.",ref:"Psalm 66:1"},
+  {text:"The LORD God is a sun and shield: the LORD will give grace and glory.",ref:"Psalm 84:11"},
+  {text:"For a day in thy courts is better than a thousand.",ref:"Psalm 84:10"},
+  {text:"He that dwelleth in the secret place of the most High shall abide under the shadow of the Almighty.",ref:"Psalm 91:1"},
+  {text:"With long life will I satisfy him, and shew him my salvation.",ref:"Psalm 91:16"},
+  {text:"O come, let us sing unto the LORD: let us make a joyful noise to the rock of our salvation.",ref:"Psalm 95:1"},
+  {text:"Know ye that the LORD he is God: it is he that hath made us, and not we ourselves.",ref:"Psalm 100:3"},
+  {text:"Enter into his gates with thanksgiving, and into his courts with praise.",ref:"Psalm 100:4"},
+  {text:"For the LORD is good; his mercy is everlasting; and his truth endureth to all generations.",ref:"Psalm 100:5"},
+  {text:"Bless the LORD, O my soul: and all that is within me, bless his holy name.",ref:"Psalm 103:1"},
+  {text:"The LORD is merciful and gracious, slow to anger, and plenteous in mercy.",ref:"Psalm 103:8"},
+  {text:"For as the heaven is high above the earth, so great is his mercy toward them that fear him.",ref:"Psalm 103:11"},
+  {text:"I will praise thee; for I am fearfully and wonderfully made.",ref:"Psalm 139:14"},
+  {text:"How precious also are thy thoughts unto me, O God! how great is the sum of them!",ref:"Psalm 139:17"},
+  {text:"Search me, O God, and know my heart: try me, and know my thoughts.",ref:"Psalm 139:23"},
+  {text:"The LORD shall preserve thee from all evil: he shall preserve thy soul.",ref:"Psalm 121:7"},
+  {text:"A wise man will hear, and will increase learning.",ref:"Proverbs 1:5"},
+  {text:"The fear of the LORD is the beginning of wisdom.",ref:"Proverbs 9:10"},
+  {text:"A merry heart doeth good like a medicine.",ref:"Proverbs 17:22"},
+  {text:"A good name is rather to be chosen than great riches.",ref:"Proverbs 22:1"},
+  {text:"Train up a child in the way he should go: and when he is old, he will not depart from it.",ref:"Proverbs 22:6"},
+  {text:"Where there is no vision, the people perish.",ref:"Proverbs 29:18"},
+  {text:"She is more precious than rubies: and all the things thou canst desire are not to be compared unto her.",ref:"Proverbs 3:15"},
+  {text:"A friend loveth at all times, and a brother is born for adversity.",ref:"Proverbs 17:17"},
+  {text:"The LORD is righteous in all his ways, and holy in all his works.",ref:"Psalm 145:17"},
+  {text:"Heaven and earth shall pass away, but my words shall not pass away.",ref:"Matthew 24:35"},
+  {text:"Thou shalt love the Lord thy God with all thy heart, and with all thy soul, and with all thy mind.",ref:"Matthew 22:37"},
+  {text:"Thou shalt love thy neighbour as thyself.",ref:"Matthew 22:39"},
+  {text:"Blessed are they which do hunger and thirst after righteousness: for they shall be filled.",ref:"Matthew 5:6"},
+  {text:"Ye are the light of the world. A city that is set on an hill cannot be hid.",ref:"Matthew 5:14"},
+  {text:"Lay not up for yourselves treasures upon earth… but lay up for yourselves treasures in heaven.",ref:"Matthew 6:19-20"},
+  {text:"The light of the body is the eye: if therefore thine eye be single, thy whole body shall be full of light.",ref:"Matthew 6:22"},
+  {text:"I am the way, the truth, and the life: no man cometh unto the Father, but by me.",ref:"John 14:6"},
+  {text:"Abide in me, and I in you. As the branch cannot bear fruit of itself, except it abide in the vine.",ref:"John 15:4"},
+  {text:"Greater love hath no man than this, that a man lay down his life for his friends.",ref:"John 15:13"},
+  {text:"If ye love me, keep my commandments.",ref:"John 14:15"},
+  {text:"In my Father's house are many mansions: if it were not so, I would have told you.",ref:"John 14:2"},
+  {text:"Let not your heart be troubled: ye believe in God, believe also in me.",ref:"John 14:1"},
+  {text:"I am the resurrection, and the life: he that believeth in me, though he were dead, yet shall he live.",ref:"John 11:25"},
+  {text:"And ye shall know the truth, and the truth shall make you free.",ref:"John 8:32"},
+  {text:"In the beginning was the Word, and the Word was with God, and the Word was God.",ref:"John 1:1"},
+  {text:"But as many as received him, to them gave he power to become the sons of God.",ref:"John 1:12"},
+  {text:"The thief cometh not, but for to steal, and to kill, and to destroy: I am come that they might have life.",ref:"John 10:10"},
+  {text:"I am the good shepherd: the good shepherd giveth his life for the sheep.",ref:"John 10:11"},
+  {text:"For God sent not his Son into the world to condemn the world; but that the world through him might be saved.",ref:"John 3:17"},
+  {text:"Whoever believes in him is not condemned.",ref:"John 3:18"},
+  {text:"If we confess our sins, he is faithful and just to forgive us our sins.",ref:"1 John 1:9"},
+  {text:"Beloved, let us love one another: for love is of God.",ref:"1 John 4:7"},
+  {text:"For whatsoever is born of God overcometh the world: and this is the victory… even our faith.",ref:"1 John 5:4"},
+  {text:"We love him, because he first loved us.",ref:"1 John 4:19"},
+  {text:"For I am persuaded, that neither death, nor life… shall be able to separate us from the love of God.",ref:"Romans 8:38-39"},
+  {text:"What shall we then say to these things? If God be for us, who can be against us?",ref:"Romans 8:31"},
+  {text:"For all have sinned, and come short of the glory of God.",ref:"Romans 3:23"},
+  {text:"Therefore being justified by faith, we have peace with God through our Lord Jesus Christ.",ref:"Romans 5:1"},
+  {text:"But God commendeth his love toward us, in that, while we were yet sinners, Christ died for us.",ref:"Romans 5:8"},
+  {text:"For the law of the Spirit of life in Christ Jesus hath made me free from the law of sin and death.",ref:"Romans 8:2"},
+  {text:"And do not be conformed to this world, but be ye transformed by the renewing of your mind.",ref:"Romans 12:2"},
+  {text:"Rejoicing in hope; patient in tribulation; continuing instant in prayer.",ref:"Romans 12:12"},
+  {text:"Bless them which persecute you: bless, and curse not.",ref:"Romans 12:14"},
+  {text:"Be not overcome of evil, but overcome evil with good.",ref:"Romans 12:21"},
+  {text:"Owe no man any thing, but to love one another.",ref:"Romans 13:8"},
+  {text:"The night is far spent, the day is at hand: let us therefore cast off the works of darkness.",ref:"Romans 13:12"},
+  {text:"For the kingdom of God is not meat and drink; but righteousness, and peace, and joy in the Holy Ghost.",ref:"Romans 14:17"},
+  {text:"Eye hath not seen, nor ear heard, neither have entered into the heart of man, the things which God hath prepared for them that love him.",ref:"1 Corinthians 2:9"},
+  {text:"Know ye not that ye are the temple of God, and that the Spirit of God dwelleth in you?",ref:"1 Corinthians 3:16"},
+  {text:"For the preaching of the cross is to them that perish foolishness; but unto us which are saved it is the power of God.",ref:"1 Corinthians 1:18"},
+  {text:"And now abideth faith, hope, charity, these three; but the greatest of these is charity.",ref:"1 Corinthians 13:13"},
+  {text:"For we walk by faith, not by sight.",ref:"2 Corinthians 5:7"},
+  {text:"Therefore if any man be in Christ, he is a new creature: old things are passed away; behold, all things are become new.",ref:"2 Corinthians 5:17"},
+  {text:"For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.",ref:"2 Timothy 1:7"},
+  {text:"I have fought a good fight, I have finished my course, I have kept the faith.",ref:"2 Timothy 4:7"},
+  {text:"All scripture is given by inspiration of God, and is profitable for doctrine, for reproof, for correction.",ref:"2 Timothy 3:16"},
+  {text:"Study to shew thyself approved unto God, a workman that needeth not to be ashamed.",ref:"2 Timothy 2:15"},
+  {text:"And let us not be weary in well doing: for in due season we shall reap, if we faint not.",ref:"Galatians 6:9"},
+  {text:"But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith.",ref:"Galatians 5:22"},
+  {text:"If we live in the Spirit, let us also walk in the Spirit.",ref:"Galatians 5:25"},
+  {text:"I am crucified with Christ: nevertheless I live; yet not I, but Christ liveth in me.",ref:"Galatians 2:20"},
+  {text:"For by grace are ye saved through faith; and that not of yourselves: it is the gift of God.",ref:"Ephesians 2:8"},
+  {text:"Put on the whole armour of God, that ye may be able to stand against the wiles of the devil.",ref:"Ephesians 6:11"},
+  {text:"Be ye kind one to another, tenderhearted, forgiving one another, even as God for Christ's sake hath forgiven you.",ref:"Ephesians 4:32"},
+  {text:"And grieve not the holy Spirit of God, whereby ye are sealed unto the day of redemption.",ref:"Ephesians 4:30"},
+  {text:"Strengthened with all might, according to his glorious power, unto all patience and longsuffering with joyfulness.",ref:"Colossians 1:11"},
+  {text:"For in him dwelleth all the fulness of the Godhead bodily.",ref:"Colossians 2:9"},
+  {text:"Set your affection on things above, not on things on the earth.",ref:"Colossians 3:2"},
+  {text:"And whatsoever ye do, do it heartily, as to the Lord, and not unto men.",ref:"Colossians 3:23"},
+  {text:"Now the God of hope fill you with all joy and peace in believing.",ref:"Romans 15:13"},
+  {text:"Draw nigh to God, and he will draw nigh to you.",ref:"James 4:8"},
+  {text:"Resist the devil, and he will flee from you.",ref:"James 4:7"},
+  {text:"But be ye doers of the word, and not hearers only.",ref:"James 1:22"},
+  {text:"For the LORD giveth wisdom: out of his mouth cometh knowledge and understanding.",ref:"Proverbs 2:6"},
+  {text:"Blessed is the man that endureth temptation: for when he is tried, he shall receive the crown of life.",ref:"James 1:12"},
+  {text:"Every good gift and every perfect gift is from above, and cometh down from the Father of lights.",ref:"James 1:17"},
+  {text:"The effectual fervent prayer of a righteous man availeth much.",ref:"James 5:16"},
+  {text:"He that covereth his sins shall not prosper: but whoso confesseth and forsaketh them shall have mercy.",ref:"Proverbs 28:13"},
+  {text:"Where there is no counsel, the people fall: but in the multitude of counsellors there is safety.",ref:"Proverbs 11:14"},
+  {text:"The tongue of the wise useth knowledge aright.",ref:"Proverbs 15:2"},
+  {text:"A soft answer turneth away wrath: but grievous words stir up anger.",ref:"Proverbs 15:1"},
+  {text:"Even a child is known by his doings, whether his work be pure, and whether it be right.",ref:"Proverbs 20:11"},
+  {text:"The rich and poor meet together: the LORD is the maker of them all.",ref:"Proverbs 22:2"},
+  {text:"For riches are not for ever: and doth the crown endure to every generation?",ref:"Proverbs 27:24"},
+  {text:"The wicked flee when no man pursueth: but the righteous are bold as a lion.",ref:"Proverbs 28:1"},
+  {text:"Whoso trusteth in the LORD, happy is he.",ref:"Proverbs 16:20"},
+  {text:"The LORD is far from the wicked: but he heareth the prayer of the righteous.",ref:"Proverbs 15:29"},
+  {text:"Righteousness exalteth a nation: but sin is a reproach to any people.",ref:"Proverbs 14:34"},
+  {text:"He that walketh with wise men shall be wise.",ref:"Proverbs 13:20"},
+  {text:"Hope deferred maketh the heart sick: but when the desire cometh, it is a tree of life.",ref:"Proverbs 13:12"},
+  {text:"There is a way which seemeth right unto a man, but the end thereof are the ways of death.",ref:"Proverbs 14:12"},
+  {text:"A new heart also will I give you, and a new spirit will I put within you.",ref:"Ezekiel 36:26"},
+  {text:"So shall my word be that goeth forth out of my mouth: it shall not return unto me void.",ref:"Isaiah 55:11"},
+  {text:"Ho, every one that thirsteth, come ye to the waters.",ref:"Isaiah 55:1"},
+  {text:"For my thoughts are not your thoughts, neither are your ways my ways, saith the LORD.",ref:"Isaiah 55:8"},
+  {text:"The Spirit of the Lord GOD is upon me; because the LORD hath anointed me to preach good tidings.",ref:"Isaiah 61:1"},
+  {text:"And they that know thy name will put their trust in thee.",ref:"Psalm 9:10"},
+  {text:"Yea, I have loved thee with an everlasting love: therefore with lovingkindness have I drawn thee.",ref:"Jeremiah 31:3"},
+  {text:"For I am the LORD, I change not.",ref:"Malachi 3:6"},
+  {text:"Return unto me, and I will return unto you, saith the LORD of hosts.",ref:"Malachi 3:7"},
+  {text:"Bring ye all the tithes into the storehouse… and prove me now herewith, saith the LORD.",ref:"Malachi 3:10"},
+  {text:"The LORD hath appeared of old unto me, saying, Yea, I have loved thee with an everlasting love.",ref:"Jeremiah 31:3"},
+  {text:"For I know the plans I have for you, declares the LORD, plans to prosper you and not to harm you.",ref:"Jeremiah 29:11"},
+  {text:"Blessed is he whose transgression is forgiven, whose sin is covered.",ref:"Psalm 32:1"},
+  {text:"I will instruct thee and teach thee in the way which thou shalt go: I will guide thee with mine eye.",ref:"Psalm 32:8"},
+  {text:"Sing unto him a new song; play skilfully with a loud noise.",ref:"Psalm 33:3"},
+  {text:"The LORD looketh from heaven; he beholdeth all the sons of men.",ref:"Psalm 33:13"},
+  {text:"Our soul waiteth for the LORD: he is our help and our shield.",ref:"Psalm 33:20"},
+  {text:"Let thy mercy, O LORD, be upon us, according as we hope in thee.",ref:"Psalm 33:22"},
+  {text:"I sought the LORD, and he heard me, and delivered me from all my fears.",ref:"Psalm 34:4"},
+  {text:"This poor man cried, and the LORD heard him, and saved him out of all his troubles.",ref:"Psalm 34:6"},
+  {text:"The angel of the LORD encampeth round about them that fear him, and delivereth them.",ref:"Psalm 34:7"},
+  {text:"The LORD redeemeth the soul of his servants: and none of them that trust in him shall be desolate.",ref:"Psalm 34:22"},
+];
+
+function getDailyVerse() {
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  return KJV_VERSES[dayOfYear % KJV_VERSES.length];
+}
 
 // ── STATE ──────────────────────────────────────────────────────
 let state = loadState();
@@ -889,17 +1243,22 @@ function burst(x, y) {
   }
 }
 
+// ── VERSE CARD ─────────────────────────────────────────────────
+function verseCardHTML() {
+  const v = getDailyVerse();
+  return `<div class="verse-card">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:8px;font-family:var(--font);">Verse of the Day</div>
+    <div class="verse-text">"${v.text}"</div>
+    <div class="verse-ref">— ${v.ref}</div>
+  </div>`;
+}
+
 // ── COMPLETION RING SVG ─────────────────────────────────────────
 function ringHTML(pct, done, total) {
   const r = 36, c = 2*Math.PI*r;
   const offset = c - (pct/100)*c;
-  const msgBucket = pct===100?100:pct>=75?75:pct>=50?50:pct>=25?25:0;
-  const msgs = MESSAGES[msgBucket];
-  const msg = msgs[Math.floor(Date.now()/86400000) % msgs.length];
-  const msgClass = pct===100?'ring-msg" style="background:var(--success-bg);color:var(--success-text)'
-    :pct>=50?'ring-msg" style="background:var(--accent-bg);color:var(--accent-text)'
-    :'ring-msg" style="background:var(--surface2);color:var(--text2)';
-  const color = pct===100?'var(--success)':pct>=75?'var(--accent)':'var(--accent)';
+  const color = pct===100?'var(--success)':'var(--accent)';
+  const subMsg = pct===100?'Perfect day! 🎉':pct>=75?'Almost there!':pct>=50?'Halfway — keep going':'Let\'s get started';
   return `<div class="ring-wrap">
     <svg class="ring-svg" width="88" height="88" viewBox="0 0 88 88">
       <circle cx="44" cy="44" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="8"/>
@@ -911,8 +1270,7 @@ function ringHTML(pct, done, total) {
     </svg>
     <div class="ring-info">
       <div class="ring-pct">${done}/${total}</div>
-      <div class="ring-sub">blocks completed today</div>
-      <div class="${msgClass}">${msg}</div>
+      <div class="ring-sub">${subMsg}</div>
     </div>
   </div>`;
 }
@@ -1101,6 +1459,7 @@ function renderEmojiGrid() {
 function renderColorGrid() {
   const el = document.getElementById('color-grid');
   if (!el) return;
+  el.className = 'color-grid col';
   el.innerHTML = COLORS.map(c=>
     `<div class="color-swatch ${c.id===selectedColor?'sel':''}" style="background:${c.light};border-color:${c.id===selectedColor?c.dot:'transparent'}" onclick="pickColor('${c.id}')"></div>`
   ).join('');
@@ -1348,16 +1707,19 @@ function toggleNotePanel(dk, id) {
   render();
   if (openNoteId) {
     setTimeout(() => {
-      const ta = document.getElementById('note-ta-' + id);
-      if (ta) ta.focus();
-    }, 80);
+      const b = (state.blocks[dk] || []).find(x => x.id === id);
+      renderBulletEditor(id, b ? b.notes : []);
+      const first = document.querySelector(`#note-editor-${id} .bullet-line input`);
+      if (first) first.focus();
+    }, 30);
   }
 }
 
 function saveNote(dk, id) {
-  const ta = document.getElementById('note-ta-' + id);
-  if (!ta) return;
-  const notes = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+  const editor = document.getElementById('note-editor-' + id);
+  if (!editor) return;
+  const notes = [...editor.querySelectorAll('.bullet-line input')]
+    .map(i => i.value.trim()).filter(Boolean);
   const b = (state.blocks[dk] || []).find(x => x.id === id);
   if (b) { b.notes = notes; saveState(); }
   openNoteId = null;
@@ -1366,9 +1728,78 @@ function saveNote(dk, id) {
 
 function clearNote(dk, id) {
   const b = (state.blocks[dk] || []).find(x => x.id === id);
-  if (b) { pushUndo(`Note cleared`); b.notes = []; saveState(); showUndoToast('Note cleared'); }
+  if (b) { pushUndo('Note cleared'); b.notes = []; saveState(); showUndoToast('Note cleared'); }
   openNoteId = null;
   render();
+}
+
+function addBulletLine(id, value='', focusNew=true) {
+  const editor = document.getElementById('note-editor-' + id);
+  if (!editor) return;
+  const line = document.createElement('div');
+  line.className = 'bullet-line';
+  line.innerHTML = `<span class="bullet-line-dot">•</span>
+    <input type="text" value="${value.replace(/"/g,'&quot;')}" placeholder="Add a reminder…" />
+    <button class="bullet-line-del" onclick="removeBulletLine(this)" tabindex="-1">×</button>`;
+  const inp = line.querySelector('input');
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addBulletLine(id, '', true);
+    } else if (e.key === 'Backspace' && inp.value === '') {
+      e.preventDefault();
+      const prev = line.previousElementSibling;
+      removeBulletLine(line.querySelector('.bullet-line-del'));
+      if (prev && prev.classList.contains('bullet-line')) {
+        const prevInp = prev.querySelector('input');
+        if (prevInp) { prevInp.focus(); prevInp.setSelectionRange(prevInp.value.length, prevInp.value.length); }
+      }
+    }
+  });
+  // insert before the add-line button
+  const addBtn = editor.querySelector('.note-add-line');
+  editor.querySelector('.bullet-editor').insertBefore(line, addBtn);
+  if (focusNew) setTimeout(() => inp.focus(), 20);
+}
+
+function removeBulletLine(btn) {
+  const line = btn.closest('.bullet-line');
+  if (!line) return;
+  const editor = line.closest('.bullet-editor');
+  const lines = editor ? editor.querySelectorAll('.bullet-line') : [];
+  if (lines.length <= 1) { line.querySelector('input').value = ''; return; }
+  line.remove();
+}
+
+function renderBulletEditor(id, notes) {
+  const wrap = document.getElementById('note-editor-' + id);
+  if (!wrap) return;
+  const existing = notes && notes.length ? notes : [''];
+  wrap.querySelector('.bullet-editor').innerHTML = existing.map(n =>
+    `<div class="bullet-line">
+      <span class="bullet-line-dot">•</span>
+      <input type="text" value="${n.replace(/"/g,'&quot;')}" placeholder="Add a reminder…" />
+      <button class="bullet-line-del" onclick="removeBulletLine(this)" tabindex="-1">×</button>
+    </div>`
+  ).join('') + `<button class="note-add-line" onclick="addBulletLine('${id}')">+ add bullet</button>`;
+  // wire up keyboard events
+  wrap.querySelectorAll('.bullet-line input').forEach((inp, i, all) => {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addBulletLine(id, '', true);
+      } else if (e.key === 'Backspace' && inp.value === '') {
+        e.preventDefault();
+        const line = inp.closest('.bullet-line');
+        const prev = line ? line.previousElementSibling : null;
+        removeBulletLine(inp.closest('.bullet-line').querySelector('.bullet-line-del'));
+        if (prev && prev.classList.contains('bullet-line')) {
+          const prevInp = prev.querySelector('input');
+          if (prevInp) { prevInp.focus(); prevInp.setSelectionRange(prevInp.value.length, prevInp.value.length); }
+        }
+      }
+    });
+  });
 }
 
 // ── RENDER ─────────────────────────────────────────────────────
@@ -1407,7 +1838,7 @@ function renderDay(dates) {
   const pct=blocks.length?Math.round(done/blocks.length*100):0;
 
   // ring
-  document.getElementById('ring-area').innerHTML=ringHTML(pct,done,blocks.length);
+  document.getElementById('ring-area').innerHTML=ringHTML(pct,done,blocks.length) + (isToday(selDate) ? verseCardHTML() : '');
 
   // perfect day banner
   let perfectHTML='';
@@ -1486,11 +1917,22 @@ function renderDay(dates) {
 
         // inline editable note panel
         const notePanelHTML = noteOpen ? `<div class="note-panel">
-          <textarea id="note-ta-${b.id}" placeholder="Add reminders, one per line…&#10;e.g. Don't skip warm-up&#10;Drink water after">${(b.notes||[]).join('\n')}</textarea>
+          <div class="bullet-editor-wrap" id="note-editor-${b.id}">
+            <div class="bullet-editor">
+              ${(b.notes && b.notes.length ? b.notes : ['']).map(n =>
+                `<div class="bullet-line">
+                  <span class="bullet-line-dot">•</span>
+                  <input type="text" value="${n.replace(/"/g,'&quot;')}" placeholder="Add a reminder…" />
+                  <button class="bullet-line-del" onclick="removeBulletLine(this)" tabindex="-1">×</button>
+                </div>`
+              ).join('')}
+              <button class="note-add-line" onclick="addBulletLine('${b.id}')">+ add bullet</button>
+            </div>
+          </div>
           <div class="note-panel-footer">
-            <span class="note-panel-hint">Each line = one bullet</span>
+            <span class="note-panel-hint">Enter for new bullet • Backspace on empty line to delete</span>
             <div style="display:flex;gap:6px;">
-              ${hasNotes?`<button class="note-clear-btn" onclick="clearNote('${selectedDay}','${b.id}')">Clear</button>`:''}
+              ${hasNotes?`<button class="note-clear-btn" onclick="clearNote('${selectedDay}','${b.id}')">Clear all</button>`:''}
               <button class="note-save-btn" onclick="saveNote('${selectedDay}','${b.id}')">Save</button>
             </div>
           </div>
@@ -1657,6 +2099,64 @@ function renderProgress() {
     </div>`;
 }
 
+// ── ACCENT COLOR ───────────────────────────────────────────────
+const ACCENT_PALETTES = [
+  { name:'Indigo',  light:'#4f6ef7', dark:'#6b8af8', bg:'#edf0ff', text:'#2740c8' },
+  { name:'Violet',  light:'#7c3aed', dark:'#9d65f5', bg:'#f3eeff', text:'#5b21b6' },
+  { name:'Sky',     light:'#0284c7', dark:'#38b2f5', bg:'#e0f4ff', text:'#0369a1' },
+  { name:'Teal',    light:'#0d9488', dark:'#2dd4bf', bg:'#e0f7f5', text:'#0f766e' },
+  { name:'Emerald', light:'#16a34a', dark:'#34d469', bg:'#e4f7ee', text:'#15803d' },
+  { name:'Rose',    light:'#e11d48', dark:'#fb7185', bg:'#fff0f3', text:'#be123c' },
+  { name:'Orange',  light:'#ea580c', dark:'#fb923c', bg:'#fff4ed', text:'#c2410c' },
+  { name:'Amber',   light:'#d97706', dark:'#fbbf24', bg:'#fef9e7', text:'#b45309' },
+  { name:'Pink',    light:'#db2777', dark:'#f472b6', bg:'#fdf2f8', text:'#9d174d' },
+  { name:'Slate',   light:'#475569', dark:'#94a3b8', bg:'#f1f5f9', text:'#334155' },
+];
+
+let currentAccentIdx = parseInt(localStorage.getItem('accent_idx') || '0');
+
+function applyAccent(idx) {
+  currentAccentIdx = idx;
+  const p = ACCENT_PALETTES[idx];
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const root = document.documentElement;
+  root.style.setProperty('--accent', dark ? p.dark : p.light);
+  root.style.setProperty('--accent-bg', p.bg);
+  root.style.setProperty('--accent-text', p.text);
+  localStorage.setItem('accent_idx', idx);
+  renderAccentSwatches();
+}
+
+function renderAccentSwatches() {
+  const wrap = document.getElementById('accent-swatches');
+  if (!wrap) return;
+  wrap.innerHTML = ACCENT_PALETTES.map((p, i) =>
+    `<div class="accent-swatch ${i===currentAccentIdx?'sel':''}"
+      style="background:${p.light};"
+      onclick="applyAccent(${i});closeColorFlyout()"
+      title="${p.name}"></div>`
+  ).join('');
+}
+
+function toggleColorFlyout() {
+  const fly = document.getElementById('color-flyout');
+  if (!fly) return;
+  const isOpen = fly.classList.contains('open');
+  if (isOpen) { fly.classList.remove('open'); }
+  else { renderAccentSwatches(); fly.classList.add('open'); }
+}
+
+function closeColorFlyout() {
+  const fly = document.getElementById('color-flyout');
+  if (fly) fly.classList.remove('open');
+}
+
+// close flyout when clicking outside
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.color-picker-wrap');
+  if (wrap && !wrap.contains(e.target)) closeColorFlyout();
+});
+
 // ── THEME ──────────────────────────────────────────────────────
 // manualTheme: 'light' | 'dark' | null (null = auto)
 let manualTheme = localStorage.getItem('theme_pref') || null;
@@ -1678,6 +2178,7 @@ function toggleTheme() {
   manualTheme = currentlyDark ? 'light' : 'dark';
   localStorage.setItem('theme_pref', manualTheme);
   applyTheme();
+  applyAccent(currentAccentIdx);
 }
 
 // auto-switch check every minute — resets manual override only at the auto boundaries
@@ -1696,6 +2197,7 @@ document.querySelectorAll('.modal-overlay').forEach(m=>
   m.addEventListener('click',e=>{ if(e.target===m) closeModals(); })
 );
 applyTheme();
+applyAccent(currentAccentIdx);
 selectedDay=todayKey();
 ensureBlocks(todayKey(), new Date().getDay());
 render();

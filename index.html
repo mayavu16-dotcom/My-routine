@@ -1562,13 +1562,13 @@ function saveBlock() {
   const name=document.getElementById('b-name').value.trim();
   if (!name) return;
   const time=getPickedTime();
-  const notes = [];
   if (!state.blocks[selectedDay]) state.blocks[selectedDay]=[];
   if (editingBlockId) {
     const b=state.blocks[selectedDay].find(x=>x.id===editingBlockId);
-    if (b) { b.name=name; b.time=time; b.color=selectedColor; b.emoji=selectedEmoji; b.notes=notes; }
+    // preserve existing notes — don't wipe them on edit
+    if (b) { b.name=name; b.time=time; b.color=selectedColor; b.emoji=selectedEmoji; }
   } else {
-    state.blocks[selectedDay].push({id:`c${Date.now()}`,name,time,color:selectedColor,emoji:selectedEmoji,done:false,notes});
+    state.blocks[selectedDay].push({id:`c${Date.now()}`,name,time,color:selectedColor,emoji:selectedEmoji,done:false,notes:[]});
   }
   saveState(); closeModals(); render();
 }
@@ -2000,9 +2000,15 @@ function applyUnifiedCopy() {
   pushUndo('Copy undone');
   targetDays.forEach(dk => {
     if (!state.blocks[dk]) state.blocks[dk] = [];
-    // add only blocks not already present by name
+    // add new blocks or update time/color/emoji on existing ones
     srcBlocks.forEach(b => {
-      if (!state.blocks[dk].find(x => x.name === b.name)) {
+      const existing = state.blocks[dk].find(x => x.name === b.name);
+      if (existing) {
+        // update time and appearance but preserve done state and notes
+        existing.time = b.time;
+        existing.color = b.color;
+        existing.emoji = b.emoji;
+      } else {
         state.blocks[dk].push({ ...b, id:`copy-${Date.now()}-${Math.random().toString(36).slice(2)}`, done:false });
       }
     });

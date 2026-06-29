@@ -704,6 +704,41 @@ body {
   /* fab */
   .fab { width: 48px; height: 48px; font-size: 24px; bottom: calc(18px + var(--safe-bottom)); right: 14px; }
 }
+/* ── DAY MENU ── */
+.day-menu-wrap { position: relative; }
+.day-menu-btn {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 5px 11px;
+  font-size: 15px; font-weight: 700; color: var(--text2);
+  cursor: pointer; letter-spacing: 2px; line-height: 1;
+  transition: background 0.15s;
+}
+.day-menu-btn:hover { background: var(--surface3); }
+.day-menu-btn:active { opacity: 0.6; }
+.day-menu {
+  display: none; position: absolute; top: calc(100% + 6px); right: 0;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 14px; padding: 6px; z-index: 200;
+  min-width: 170px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  flex-direction: column; gap: 2px;
+}
+.day-menu.open { display: flex; }
+.day-menu-item {
+  display: flex; align-items: center; gap: 10px;
+  background: none; border: none; width: 100%;
+  padding: 10px 12px; border-radius: 10px;
+  font-size: 14px; font-weight: 500; color: var(--text);
+  cursor: pointer; text-align: left;
+  transition: background 0.12s;
+}
+.day-menu-item:hover { background: var(--surface2); }
+.day-menu-item:active { opacity: 0.6; }
+.day-menu-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+.day-menu-danger { color: #dc2626; }
+[data-theme="dark"] .day-menu-danger { color: #f87171; }
+@media (prefers-color-scheme: dark) { .day-menu-danger { color: #f87171; } }
+.day-menu-divider { height: 1px; background: var(--border); margin: 4px 6px; }
 </style>
 <body>
 
@@ -743,9 +778,21 @@ body {
   <div class="section-head">
     <div class="section-title" id="day-heading">Today</div>
     <div style="display:flex;gap:8px;align-items:center;">
-      <button class="trash-btn" id="trash-btn" onclick="enterSelectMode()" title="Delete blocks">🗑</button>
-      <button class="add-btn" id="copy-day-btn" onclick="openCopyModal()" style="background:var(--surface2);color:var(--text2);border:0.5px solid var(--border2);">Copy</button>
-      <button class="add-btn" onclick="openAddBlock()">+ Add</button>
+      <div class="day-menu-wrap" id="day-menu-wrap">
+        <button class="day-menu-btn" id="day-menu-btn" onclick="toggleDayMenu()" aria-label="Day options">•••</button>
+        <div class="day-menu" id="day-menu">
+          <button class="day-menu-item" onclick="openAddBlock();closeDayMenu()">
+            <span class="day-menu-icon">＋</span> Add block
+          </button>
+          <button class="day-menu-item" id="copy-day-btn" onclick="openCopyModal();closeDayMenu()">
+            <span class="day-menu-icon">⧉</span> Copy to days
+          </button>
+          <div class="day-menu-divider"></div>
+          <button class="day-menu-item day-menu-danger" id="trash-btn" onclick="enterSelectMode();closeDayMenu()">
+            <span class="day-menu-icon">🗑</span> Delete blocks
+          </button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="blocks-list" id="blocks-list"></div>
@@ -2115,11 +2162,9 @@ function renderDay(dates) {
     isToday(selDate)?`Today — ${done}/${blocks.length}`
     :`${DAYS_SHORT[selDate.getDay()]} ${selDate.getMonth()+1}/${selDate.getDate()} — ${done}/${blocks.length}`;
 
-  // show/hide trash + add buttons
-  const trashBtn = document.getElementById('trash-btn');
-  const copyDayBtn = document.getElementById('copy-day-btn');
-  if (trashBtn) trashBtn.style.display = selectMode ? 'none' : '';
-  if (copyDayBtn) copyDayBtn.style.display = selectMode ? 'none' : '';
+  // show/hide menu during select mode
+  const menuWrap = document.getElementById('day-menu-wrap');
+  if (menuWrap) menuWrap.style.display = selectMode ? 'none' : '';
 
   // select bar
   const selWrap = document.getElementById('select-bar-wrap');
@@ -2344,6 +2389,20 @@ function renderProgress() {
       </div>
     </div>`;
 }
+
+// ── DAY MENU ──────────────────────────────────────────────────
+function toggleDayMenu() {
+  const menu = document.getElementById('day-menu');
+  if (menu) menu.classList.toggle('open');
+}
+function closeDayMenu() {
+  const menu = document.getElementById('day-menu');
+  if (menu) menu.classList.remove('open');
+}
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('day-menu-wrap');
+  if (wrap && !wrap.contains(e.target)) closeDayMenu();
+});
 
 // ── ACCENT COLOR ───────────────────────────────────────────────
 const ACCENT_PALETTES = [

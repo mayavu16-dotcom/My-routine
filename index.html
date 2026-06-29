@@ -543,14 +543,8 @@ body {
 .note-save-btn:active { opacity: 0.8; }
 .note-clear-btn { background: transparent; color: var(--text3); border: none; font-size: 12px; cursor: pointer; padding: 4px 6px; border-radius: 6px; }
 .note-clear-btn:active { opacity: 0.6; }
-.note-icon-btn {
-  background: transparent; border: none; cursor: pointer;
-  font-size: 15px; color: var(--text3); padding: 2px 4px;
-  border-radius: 6px; transition: color 0.15s, background 0.15s;
-  flex-shrink: 0;
-}
-.note-icon-btn:hover { background: var(--surface2); color: var(--accent); }
-.note-icon-btn.has-note { color: var(--accent); }
+.block-item.has-note-indicator { border-left: 3px solid var(--accent); padding-left: 11px; }
+.block-item.has-note-indicator.done { border-left-color: var(--border2); }
 .block-edit-btn {
   width: 28px; height: 28px; border-radius: 8px; border: none;
   background: transparent; color: var(--text3); font-size: 14px;
@@ -703,7 +697,6 @@ body {
   .block-emoji { font-size: 18px; width: 26px; }
   .block-edit-btn { width: 24px; height: 24px; font-size: 13px; }
   .block-check { width: 22px; height: 22px; font-size: 12px; }
-  .note-icon-btn { font-size: 13px; }
 
   /* section head */
   .section-title { font-size: 10px; }
@@ -2166,8 +2159,8 @@ function renderDay(dates) {
         </div>` : '';
 
         return `<div style="margin-bottom:8px;">
-          <div class="block-item ${b.done?'done':''}" id="bi-${b.id}"
-            style="border-radius:${blockRadius};margin-bottom:0;"
+          <div class="block-item ${b.done?'done':''} ${hasNotes||noteOpen?'has-note-indicator':''}" id="bi-${b.id}"
+            style="border-radius:${blockRadius};margin-bottom:0;cursor:pointer;"
             draggable="true"
             ondragstart="onDragStart(event,'${b.id}')"
             ondragend="onDragEnd(event,'${b.id}')"
@@ -2175,14 +2168,14 @@ function renderDay(dates) {
             ondrop="onDrop(event,'${b.id}')"
             ontouchstart="onTouchDragStart(event,'${b.id}')"
             ontouchmove="onTouchDragMove(event,'${b.id}')"
-            ontouchend="onTouchDragEnd(event,'${b.id}')">
-            <div class="block-emoji" onclick="event.stopPropagation();toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.emoji||'🎯'}</div>
-            <div class="block-info" onclick="event.stopPropagation();toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">
+            ontouchend="onTouchDragEnd(event,'${b.id}')"
+            onclick="toggleNotePanel('${selectedDay}','${b.id}')">
+            <div class="block-emoji">${b.emoji||'🎯'}</div>
+            <div class="block-info">
               <div class="block-name">${b.name}</div>
               ${b.time?`<div class="block-time">${b.time}</div>`:''}
             </div>
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;">
-              <button class="note-icon-btn ${hasNotes?'has-note':''}" onclick="event.stopPropagation();toggleNotePanel('${selectedDay}','${b.id}')" title="${noteOpen?'Close note':'Add note'}">📝</button>
               <button class="block-edit-btn" onclick="event.stopPropagation();openEditBlock('${selectedDay}','${b.id}')" title="Edit">✎</button>
               <div class="block-check" style="border-color:${b.done?'':c.dot}" onclick="event.stopPropagation();toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.done?'✓':''}</div>
             </div>

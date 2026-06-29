@@ -424,8 +424,49 @@ body {
 .btn-cancel { background: var(--surface2); color: var(--text2); }
 .btn-save { background: var(--accent); color: #fff; }
 .btn-cancel:active, .btn-save:active { opacity: 0.75; }
-.btn-delete { background: #fee2e2; color: #dc2626; }
-@media (prefers-color-scheme: dark) { .btn-delete { background: #3b1010; color: #fc6060; } }
+.btn-delete {
+  background: var(--danger-soft, #fee2e2);
+  color: var(--danger-text, #b91c1c);
+  border: 1px solid var(--danger-border, #fca5a5);
+  border-radius: var(--radius); padding: 13px;
+  font-size: 15px; font-weight: 600; cursor: pointer; flex: 1;
+}
+.btn-delete:active { opacity: 0.75; }
+@media (prefers-color-scheme: dark) {
+  .btn-delete { background: #2d0f0f; color: #f87171; border-color: #7f1d1d; }
+}
+[data-theme="dark"] .btn-delete { background: #2d0f0f; color: #f87171; border-color: #7f1d1d; }
+[data-theme="light"] .btn-delete { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+/* ── INLINE NOTE ── */
+.note-panel {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-top: none; border-radius: 0 0 var(--radius) var(--radius);
+  padding: 10px 14px 12px; animation: noteSlide 0.18s ease;
+}
+@keyframes noteSlide {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.note-panel textarea {
+  width: 100%; background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 9px 11px; font-size: 13px; color: var(--text);
+  font-family: var(--font); resize: none; min-height: 80px; line-height: 1.6;
+}
+.note-panel textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+.note-panel-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 7px; gap: 8px; }
+.note-panel-hint { font-size: 11px; color: var(--text3); }
+.note-save-btn { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.note-save-btn:active { opacity: 0.8; }
+.note-clear-btn { background: transparent; color: var(--text3); border: none; font-size: 12px; cursor: pointer; padding: 4px 6px; border-radius: 6px; }
+.note-clear-btn:active { opacity: 0.6; }
+.note-icon-btn {
+  background: transparent; border: none; cursor: pointer;
+  font-size: 15px; color: var(--text3); padding: 2px 4px;
+  border-radius: 6px; transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.note-icon-btn:hover { background: var(--surface2); color: var(--accent); }
+.note-icon-btn.has-note { color: var(--accent); }
 .block-edit-btn {
   width: 28px; height: 28px; border-radius: 8px; border: none;
   background: transparent; color: var(--text3); font-size: 14px;
@@ -500,6 +541,41 @@ body {
 @media (prefers-color-scheme: dark) { .btn-bulk-delete { background: #3b1010 !important; color: #fc6060 !important; } }
 [data-theme="dark"] .btn-bulk-delete { background: #3b1010; color: #fc6060; }
 [data-theme="light"] .btn-bulk-delete { background: #fee2e2; color: #dc2626; }
+/* ── UNDO TOAST ── */
+.undo-toast {
+  position: fixed; bottom: calc(88px + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
+  background: var(--text); color: var(--bg);
+  border-radius: 24px; padding: 11px 18px;
+  display: flex; align-items: center; gap: 12px;
+  font-size: 14px; font-weight: 500; white-space: nowrap;
+  z-index: 300; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  animation: toastIn 0.25s ease;
+  pointer-events: all;
+}
+.undo-toast.hiding { animation: toastOut 0.25s ease forwards; }
+.undo-btn {
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 12px; padding: 5px 12px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.undo-btn:active { opacity: 0.8; }
+.undo-progress {
+  position: absolute; bottom: 0; left: 0; height: 3px;
+  background: var(--accent); border-radius: 0 0 24px 24px;
+  animation: undoProgress linear forwards;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(-50%) translateY(0); }
+  to   { opacity: 0; transform: translateX(-50%) translateY(12px); }
+}
+@keyframes undoProgress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
 </style>
 <body>
 
@@ -596,13 +672,6 @@ body {
       </div>
     </div>
     <div class="field"><label>Color</label><div class="color-grid" id="color-grid"></div></div>
-    <div class="field" id="note-field-wrap" style="display:none">
-      <label>Notes <span style="font-size:11px;color:var(--text3);font-weight:400">(one bullet per line)</span></label>
-      <div class="note-field-wrap">
-        <textarea id="b-note" placeholder="e.g. Don't skip warm-up&#10;Drink water after&#10;Focus on form"></textarea>
-      </div>
-      <div class="note-hint">Each line becomes a bullet point shown under the block.</div>
-    </div>
     <div class="modal-actions" id="modal-block-actions">
       <button class="btn-cancel" onclick="closeModals()">Cancel</button>
       <button class="btn-save" onclick="saveBlock()">Save</button>
@@ -624,6 +693,7 @@ body {
 </div>
 
 <button class="fab" onclick="openAddBlock()">+</button>
+<div id="undo-toast" style="display:none"></div>
 
 <script>
 // ── CONSTANTS ──────────────────────────────────────────────────
@@ -732,6 +802,11 @@ let selectMode = false;
 let selectedBlocks = new Set();
 let longPressTimer = null;
 let dragSrcId = null;
+let undoStack = [];
+let undoTimer = null;
+let undoHideTimer = null;
+const UNDO_DURATION = 5000;
+let openNoteId = null;
 
 function loadState() {
   try {
@@ -943,8 +1018,6 @@ function getPickedTime() {
 function openAddBlock() {
   editingBlockId = null;
   document.getElementById('b-name').value='';
-  document.getElementById('b-note').value='';
-  document.getElementById('note-field-wrap').style.display='none';
   document.getElementById('modal-block-title').textContent='Add time block';
   document.getElementById('modal-block-actions').innerHTML=`
     <button class="btn-cancel" onclick="closeModals()">Cancel</button>
@@ -964,11 +1037,6 @@ function openEditBlock(dk, id) {
   if (!b) return;
   editingBlockId = id;
   document.getElementById('b-name').value = b.name;
-  // show note field pre-filled when editing
-  const noteWrap = document.getElementById('note-field-wrap');
-  const noteEl = document.getElementById('b-note');
-  noteWrap.style.display = 'block';
-  noteEl.value = (b.notes||[]).join('\n');
   document.getElementById('modal-block-title').textContent = 'Edit block';
   document.getElementById('modal-block-actions').innerHTML=`
     <button class="btn-delete" onclick="deleteBlock('${dk}','${id}')">Delete</button>
@@ -984,8 +1052,11 @@ function openEditBlock(dk, id) {
 }
 
 function deleteBlock(dk, id) {
+  const b = (state.blocks[dk]||[]).find(x=>x.id===id);
+  pushUndo(`"${b?b.name:'Block'}" deleted`);
   state.blocks[dk] = (state.blocks[dk]||[]).filter(x=>x.id!==id);
   saveState(); closeModals(); render();
+  showUndoToast(`"${b?b.name:'Block'}" deleted`);
 }
 
 function openAddHabit() {
@@ -1013,8 +1084,11 @@ function openEditHabit(id) {
 }
 
 function deleteHabit(id) {
+  const h = state.habits.find(x=>x.id===id);
+  pushUndo(`"${h?h.name:'Habit'}" deleted`);
   state.habits = state.habits.filter(x=>x.id!==id);
   saveState(); closeModals(); render();
+  showUndoToast(`"${h?h.name:'Habit'}" deleted`);
 }
 
 function renderEmojiGrid() {
@@ -1038,8 +1112,7 @@ function saveBlock() {
   const name=document.getElementById('b-name').value.trim();
   if (!name) return;
   const time=getPickedTime();
-  const noteRaw=document.getElementById('b-note').value;
-  const notes=noteRaw.split('\n').map(s=>s.trim()).filter(Boolean);
+  const notes = [];
   if (!state.blocks[selectedDay]) state.blocks[selectedDay]=[];
   if (editingBlockId) {
     const b=state.blocks[selectedDay].find(x=>x.id===editingBlockId);
@@ -1090,7 +1163,7 @@ function toggleHabit(hid, dk, el) {
   render();
 }
 
-function selectDay(dk) { selectedDay=dk; selectMode=false; selectedBlocks=new Set(); render(); }
+function selectDay(dk) { selectedDay=dk; selectMode=false; selectedBlocks=new Set(); openNoteId=null; render(); }
 
 function habitStreak(hid) {
   let streak=0;
@@ -1128,9 +1201,11 @@ function onDrop(e, targetId) {
   const srcIdx = blocks.findIndex(b=>b.id===dragSrcId);
   const tgtIdx = blocks.findIndex(b=>b.id===targetId);
   if (srcIdx<0||tgtIdx<0) return;
+  pushUndo('Reorder undone');
   const [moved] = blocks.splice(srcIdx,1);
   blocks.splice(tgtIdx,0,moved);
   saveState(); render();
+  showUndoToast('Order changed');
 }
 
 // touch-based drag (mobile)
@@ -1178,15 +1253,58 @@ function onTouchDragEnd(e, id) {
       const srcIdx = blocks.findIndex(b=>b.id===touchDragId);
       const tgtIdx = blocks.findIndex(b=>b.id===targetId);
       if (srcIdx>=0&&tgtIdx>=0) {
+        pushUndo('Reorder undone');
         const [moved]=blocks.splice(srcIdx,1);
         blocks.splice(tgtIdx,0,moved);
         saveState();
+        showUndoToast('Order changed');
       }
       break;
     }
   }
   document.querySelectorAll('.block-item').forEach(el=>el.classList.remove('drag-over'));
   touchDragId=null; render();
+}
+
+// ── UNDO ──────────────────────────────────────────────────────
+function snapshotState() {
+  return JSON.stringify({ blocks: state.blocks, habits: state.habits, habitDone: state.habitDone });
+}
+
+function pushUndo(label) {
+  undoStack.push({ label, snapshot: snapshotState() });
+  if (undoStack.length > 20) undoStack.shift();
+}
+
+function showUndoToast(label) {
+  if (undoTimer) clearTimeout(undoTimer);
+  if (undoHideTimer) clearTimeout(undoHideTimer);
+  const toast = document.getElementById('undo-toast');
+  toast.style.display = 'flex';
+  toast.className = 'undo-toast';
+  toast.innerHTML = `
+    <span>${label}</span>
+    <button class="undo-btn" onclick="doUndo()">Undo</button>
+    <div class="undo-progress" style="animation-duration:${UNDO_DURATION}ms"></div>`;
+  undoTimer = setTimeout(() => hideUndoToast(), UNDO_DURATION);
+}
+
+function hideUndoToast() {
+  const toast = document.getElementById('undo-toast');
+  toast.classList.add('hiding');
+  undoHideTimer = setTimeout(() => { toast.style.display = 'none'; toast.className = 'undo-toast'; }, 250);
+}
+
+function doUndo() {
+  if (!undoStack.length) return;
+  const { snapshot } = undoStack.pop();
+  const prev = JSON.parse(snapshot);
+  state.blocks = prev.blocks;
+  state.habits = prev.habits;
+  state.habitDone = prev.habitDone;
+  saveState();
+  hideUndoToast();
+  render();
 }
 
 // ── SELECT MODE ───────────────────────────────────────────────
@@ -1216,9 +1334,41 @@ function selectAllBlocks() {
 
 function deleteSelectedBlocks() {
   if (!selectedBlocks.size) return;
+  const n = selectedBlocks.size;
+  pushUndo(`${n} block${n>1?'s':''} deleted`);
   state.blocks[selectedDay] = (state.blocks[selectedDay] || []).filter(b => !selectedBlocks.has(b.id));
   saveState();
   exitSelectMode();
+  showUndoToast(`${n} block${n>1?'s':''} deleted`);
+}
+
+// ── INLINE NOTES ──────────────────────────────────────────────
+function toggleNotePanel(dk, id) {
+  openNoteId = openNoteId === id ? null : id;
+  render();
+  if (openNoteId) {
+    setTimeout(() => {
+      const ta = document.getElementById('note-ta-' + id);
+      if (ta) ta.focus();
+    }, 80);
+  }
+}
+
+function saveNote(dk, id) {
+  const ta = document.getElementById('note-ta-' + id);
+  if (!ta) return;
+  const notes = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+  const b = (state.blocks[dk] || []).find(x => x.id === id);
+  if (b) { b.notes = notes; saveState(); }
+  openNoteId = null;
+  render();
+}
+
+function clearNote(dk, id) {
+  const b = (state.blocks[dk] || []).find(x => x.id === id);
+  if (b) { pushUndo(`Note cleared`); b.notes = []; saveState(); showUndoToast('Note cleared'); }
+  openNoteId = null;
+  render();
 }
 
 // ── RENDER ─────────────────────────────────────────────────────
@@ -1312,6 +1462,8 @@ function renderDay(dates) {
         const c=COLORS.find(x=>x.id===b.color)||COLORS[0];
         const isSel = selectedBlocks.has(b.id);
         const hasNotes = b.notes && b.notes.length > 0;
+        const noteOpen = openNoteId === b.id;
+
         if (selectMode) {
           return `<div class="block-item ${isSel?'selected':''}" onclick="toggleBlockSelect('${b.id}')">
             <div class="select-check">${isSel?'✓':''}</div>
@@ -1322,13 +1474,31 @@ function renderDay(dates) {
             </div>
           </div>`;
         }
-        const noteHTML = hasNotes ? `<div class="block-note-row">
+
+        // bottom radius flattens when note panel or bullet list is showing below
+        const hasBottom = hasNotes || noteOpen;
+        const blockRadius = hasBottom ? 'var(--radius) var(--radius) 0 0' : 'var(--radius)';
+
+        // bullet note display (when panel is closed but notes exist)
+        const bulletHTML = (hasNotes && !noteOpen) ? `<div class="block-note-row">
           <ul class="block-note-bullets">${b.notes.map(n=>`<li>${n}</li>`).join('')}</ul>
         </div>` : '';
-        const noteRadius = hasNotes ? 'var(--radius) var(--radius) 0 0' : 'var(--radius)';
+
+        // inline editable note panel
+        const notePanelHTML = noteOpen ? `<div class="note-panel">
+          <textarea id="note-ta-${b.id}" placeholder="Add reminders, one per line…&#10;e.g. Don't skip warm-up&#10;Drink water after">${(b.notes||[]).join('\n')}</textarea>
+          <div class="note-panel-footer">
+            <span class="note-panel-hint">Each line = one bullet</span>
+            <div style="display:flex;gap:6px;">
+              ${hasNotes?`<button class="note-clear-btn" onclick="clearNote('${selectedDay}','${b.id}')">Clear</button>`:''}
+              <button class="note-save-btn" onclick="saveNote('${selectedDay}','${b.id}')">Save</button>
+            </div>
+          </div>
+        </div>` : '';
+
         return `<div style="margin-bottom:8px;">
           <div class="block-item ${b.done?'done':''}" id="bi-${b.id}"
-            style="border-radius:${noteRadius};margin-bottom:0;"
+            style="border-radius:${blockRadius};margin-bottom:0;"
             draggable="true"
             ondragstart="onDragStart(event,'${b.id}')"
             ondragend="onDragEnd(event,'${b.id}')"
@@ -1346,11 +1516,12 @@ function renderDay(dates) {
               <div class="block-name">${b.name}</div>
               ${b.time?`<div class="block-time">${b.time}</div>`:''}
             </div>
-            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px;">
+            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;">
+              <button class="note-icon-btn ${hasNotes?'has-note':''}" onclick="event.stopPropagation();toggleNotePanel('${selectedDay}','${b.id}')" title="${noteOpen?'Close note':'Add note'}">📝</button>
               <button class="block-edit-btn" onclick="event.stopPropagation();openEditBlock('${selectedDay}','${b.id}')" title="Edit">✎</button>
               <div class="block-check" style="border-color:${b.done?'':c.dot}" onclick="event.stopPropagation();toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.done?'✓':''}</div>
             </div>
-          </div>${noteHTML}</div>`;
+          </div>${bulletHTML}${notePanelHTML}</div>`;
       }).join('')
     : `<div class="empty"><strong>No blocks</strong>Tap + to add your first block.</div>`;
 }

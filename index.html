@@ -61,6 +61,55 @@
     --streak-bg: #2a1500;
   }
 }
+[data-theme="dark"] {
+  --bg: #111111;
+  --surface: #1c1c1a;
+  --surface2: #242422;
+  --surface3: #2e2e2b;
+  --text: #f0efe9;
+  --text2: #9a9a94;
+  --text3: #5a5a56;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --accent: #5b92f6;
+  --accent-bg: #1a2a4a;
+  --accent-text: #93b8fa;
+  --success: #2ec67a;
+  --success-bg: #0d2e1e;
+  --success-text: #5de0a0;
+  --warning: #f59e0b;
+  --warning-bg: #2a1f0a;
+  --danger: #fc6060;
+  --streak: #fb923c;
+  --streak-bg: #2a1500;
+}
+[data-theme="dark"] .contrib-day.p25 { background: #14532d; color: #86efac; }
+[data-theme="dark"] .contrib-day.p50 { background: #166534; color: #bbf7d0; }
+[data-theme="dark"] .contrib-day.p75 { background: #15803d; color: #dcfce7; }
+[data-theme="dark"] .contrib-day.p100 { background: var(--success); color: #fff; }
+[data-theme="light"] {
+  --bg: #f6f6f4;
+  --surface: #ffffff;
+  --surface2: #f0efec;
+  --surface3: #e8e7e3;
+  --text: #1a1a18;
+  --text2: #6b6b67;
+  --text3: #a0a09b;
+  --border: rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.12);
+  --accent: #3b7cf4;
+  --accent-bg: #eef3fe;
+  --accent-text: #1a4fb5;
+  --success: #16a362;
+  --success-bg: #e6f7ef;
+  --success-text: #0a6b3f;
+  --warning: #d97706;
+  --warning-bg: #fef3e2;
+  --danger: #e53e3e;
+  --streak: #f97316;
+  --streak-bg: #fff4ed;
+}
+[data-theme="light"] .btn-delete { background: #fee2e2; color: #dc2626; }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { scroll-behavior: smooth; }
 body {
@@ -293,6 +342,41 @@ body {
 .emoji-grid { display: flex; gap: 8px; flex-wrap: wrap; }
 .emoji-opt { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--border2); background: var(--surface2); cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
 .emoji-opt.sel { border-color: var(--accent); background: var(--accent-bg); }
+/* ── EMOJI PICKER ── */
+.emoji-picker-wrap { display: flex; flex-direction: column; gap: 10px; }
+.emoji-preview-row { display: flex; align-items: center; gap: 10px; }
+.emoji-preview {
+  width: 56px; height: 56px; border-radius: 14px; font-size: 30px;
+  background: var(--surface2); border: 2px solid var(--border2);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: border-color 0.2s;
+}
+.emoji-preview.has-emoji { border-color: var(--accent); }
+.emoji-tap-btn {
+  flex: 1; background: var(--accent-bg); color: var(--accent-text);
+  border: 1.5px dashed var(--border-accent, var(--accent)); border-radius: var(--radius);
+  padding: 12px; font-size: 14px; font-weight: 500; cursor: pointer; text-align: center;
+  line-height: 1.4;
+}
+.emoji-tap-btn:active { opacity: 0.7; }
+.emoji-input-wrap { position: relative; }
+.emoji-input-wrap input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 10px 12px 10px 40px;
+  font-size: 22px; color: var(--text); font-family: var(--font);
+  caret-color: var(--accent);
+}
+.emoji-input-wrap input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.emoji-input-hint { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; opacity: 0.4; }
+.emoji-recents { display: flex; gap: 6px; flex-wrap: wrap; }
+.emoji-recent-item {
+  width: 38px; height: 38px; border-radius: 10px; border: 1.5px solid var(--border2);
+  background: var(--surface2); cursor: pointer; font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.emoji-recent-item:active { transform: scale(0.88); }
+.emoji-recent-item.sel { border-color: var(--accent); background: var(--accent-bg); }
 .color-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 .color-swatch { width: 32px; height: 32px; border-radius: 8px; cursor: pointer; border: 3px solid transparent; transition: border-color 0.15s, transform 0.1s; }
 .color-swatch.sel { border-color: var(--text); transform: scale(1.1); }
@@ -355,6 +439,7 @@ body {
     <div class="streak-pill" id="streak-pill">🔥 0</div>
   </div>
   <div class="nav-week">
+    <button class="nav-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle dark mode" style="font-size:18px;">🌙</button>
     <button class="nav-btn" onclick="shiftWeek(-1)">‹</button>
     <div class="week-label" id="week-label"></div>
     <button class="nav-btn" onclick="shiftWeek(1)">›</button>
@@ -416,7 +501,26 @@ body {
         <div class="tp-col" id="tp-ampm"></div>
       </div>
     </div>
-    <div class="field"><label>Icon</label><div class="emoji-grid" id="emoji-grid"></div></div>
+    <div class="field">
+      <label>Icon</label>
+      <div class="emoji-picker-wrap">
+        <div class="emoji-preview-row">
+          <div class="emoji-preview has-emoji" id="emoji-preview">☀️</div>
+          <button class="emoji-tap-btn" onclick="openNativeEmoji()">
+            Tap to pick any emoji<br><span style="font-size:12px;opacity:0.7">opens your emoji keyboard</span>
+          </button>
+        </div>
+        <div class="emoji-input-wrap">
+          <span class="emoji-input-hint">🔍</span>
+          <input id="emoji-input" placeholder="  or type / paste an emoji here" maxlength="8"
+            oninput="onEmojiInput(this.value)" autocomplete="off" autocorrect="off" />
+        </div>
+        <div id="emoji-recents-wrap" style="display:none">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Recent</div>
+          <div class="emoji-recents" id="emoji-recents"></div>
+        </div>
+      </div>
+    </div>
     <div class="field"><label>Color</label><div class="color-grid" id="color-grid"></div></div>
     <div class="modal-actions" id="modal-block-actions">
       <button class="btn-cancel" onclick="closeModals()">Cancel</button>
@@ -453,6 +557,65 @@ const COLORS = [
   { id:'gray',   light:'#F1EFE8', dot:'#888780' },
 ];
 const EMOJIS = ['☀️','💪','🍳','💼','🧘','🚶','📖','🎯','💤','🥗','🏃','🎨','✍️','🎵','🌙','💧'];
+
+// ── EMOJI PICKER ───────────────────────────────────────────────
+let recentEmojis = JSON.parse(localStorage.getItem('recent_emojis')||'[]');
+
+function getEmoji(str) {
+  // extract first emoji character from a string
+  const seg = [...(str||'')];
+  for (const ch of seg) {
+    const cp = ch.codePointAt(0);
+    if (cp > 0x231a) return ch; // anything above basic latin is likely emoji
+  }
+  return null;
+}
+
+function setEmoji(e) {
+  if (!e) return;
+  selectedEmoji = e;
+  const prev = document.getElementById('emoji-preview');
+  if (prev) { prev.textContent = e; prev.classList.add('has-emoji'); }
+  recentEmojis = [e, ...recentEmojis.filter(x=>x!==e)].slice(0,16);
+  localStorage.setItem('recent_emojis', JSON.stringify(recentEmojis));
+  renderEmojiRecents();
+}
+
+function onEmojiInput(val) {
+  const e = getEmoji(val);
+  if (e) {
+    setEmoji(e);
+    const inp = document.getElementById('emoji-input');
+    if (inp) inp.value = '';
+  }
+}
+
+function openNativeEmoji() {
+  const inp = document.getElementById('emoji-input');
+  if (inp) { inp.focus(); inp.select(); }
+}
+
+function renderEmojiGrid() {
+  // update preview with current selectedEmoji
+  const prev = document.getElementById('emoji-preview');
+  if (prev) prev.textContent = selectedEmoji;
+  const inp = document.getElementById('emoji-input');
+  if (inp) inp.value = '';
+  renderEmojiRecents();
+}
+
+function renderEmojiRecents() {
+  const wrap = document.getElementById('emoji-recents-wrap');
+  const container = document.getElementById('emoji-recents');
+  if (!wrap || !container) return;
+  const pool = [...new Set([selectedEmoji, ...recentEmojis, ...EMOJIS])].slice(0,16);
+  wrap.style.display = pool.length ? 'block' : 'none';
+  container.innerHTML = pool.map(e =>
+    `<div class="emoji-recent-item ${e===selectedEmoji?'sel':''}" onclick="setEmoji('${e}')">${e}</div>`
+  ).join('');
+}
+
+function pickEmoji(e) { setEmoji(e); }
 const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 const ROUTINE = [
@@ -706,7 +869,7 @@ function openAddBlock() {
   selectedEmoji='☀️'; selectedColor='amber';
   renderEmojiGrid(); renderColorGrid();
   document.getElementById('modal-block').classList.add('open');
-  setTimeout(()=>{ initTimePicker(); document.getElementById('b-name').focus(); }, 80);
+  setTimeout(()=>{ initTimePicker(); renderEmojiRecents(); document.getElementById('b-name').focus(); }, 80);
 }
 
 function openEditBlock(dk, id) {
@@ -725,7 +888,7 @@ function openEditBlock(dk, id) {
   selectedColor = b.color||'amber';
   renderEmojiGrid(); renderColorGrid();
   document.getElementById('modal-block').classList.add('open');
-  setTimeout(()=>{ initTimePicker(); document.getElementById('b-name').focus(); }, 80);
+  setTimeout(()=>{ initTimePicker(); renderEmojiRecents(); document.getElementById('b-name').focus(); }, 80);
 }
 
 function deleteBlock(dk, id) {
@@ -763,16 +926,20 @@ function deleteHabit(id) {
 }
 
 function renderEmojiGrid() {
-  document.getElementById('emoji-grid').innerHTML = EMOJIS.map(e=>
-    `<div class="emoji-opt ${e===selectedEmoji?'sel':''}" onclick="pickEmoji('${e}')">${e}</div>`
-  ).join('');
+  // update preview with current selectedEmoji — guard in case modal isn't open yet
+  const prev = document.getElementById('emoji-preview');
+  if (prev) prev.textContent = selectedEmoji;
+  const inp = document.getElementById('emoji-input');
+  if (inp) inp.value = '';
 }
 function renderColorGrid() {
-  document.getElementById('color-grid').innerHTML = COLORS.map(c=>
+  const el = document.getElementById('color-grid');
+  if (!el) return;
+  el.innerHTML = COLORS.map(c=>
     `<div class="color-swatch ${c.id===selectedColor?'sel':''}" style="background:${c.light};border-color:${c.id===selectedColor?c.dot:'transparent'}" onclick="pickColor('${c.id}')"></div>`
   ).join('');
 }
-function pickEmoji(e) { selectedEmoji=e; renderEmojiGrid(); }
+function pickEmoji(e) { setEmoji(e); }
 function pickColor(id) { selectedColor=id; renderColorGrid(); }
 
 function saveBlock() {
@@ -1053,16 +1220,51 @@ function renderProgress() {
     </div>`;
 }
 
+// ── THEME ──────────────────────────────────────────────────────
+// manualTheme: 'light' | 'dark' | null (null = auto)
+let manualTheme = localStorage.getItem('theme_pref') || null;
+
+function isDarkHour() {
+  const h = new Date().getHours();
+  return h >= 20 || h < 7; // 8 PM – 7 AM
+}
+
+function applyTheme() {
+  const dark = manualTheme === 'dark' || (!manualTheme && isDarkHour());
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  const btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = dark ? '☀️' : '🌙';
+}
+
+function toggleTheme() {
+  const currentlyDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  manualTheme = currentlyDark ? 'light' : 'dark';
+  localStorage.setItem('theme_pref', manualTheme);
+  applyTheme();
+}
+
+// auto-switch check every minute — resets manual override only at the auto boundaries
+function autoThemeCheck() {
+  const h = new Date().getHours(), m = new Date().getMinutes();
+  // at exactly 8:00 PM or 7:00 AM, clear manual override and let auto take over
+  if ((h === 20 || h === 7) && m === 0) {
+    manualTheme = null;
+    localStorage.removeItem('theme_pref');
+  }
+  applyTheme();
+}
+
 // ── INIT ───────────────────────────────────────────────────────
 document.querySelectorAll('.modal-overlay').forEach(m=>
   m.addEventListener('click',e=>{ if(e.target===m) closeModals(); })
 );
+applyTheme();
 selectedDay=todayKey();
 ensureBlocks(todayKey(), new Date().getDay());
 render();
 
-// refresh now-card every minute
-setInterval(()=>{ if(activeTab==='day') render(); }, 60000);
+// refresh now-card every minute + auto theme check
+setInterval(()=>{ if(activeTab==='day') render(); autoThemeCheck(); }, 60000);
 </script>
 </body>
 </html>

@@ -301,6 +301,18 @@ body {
 .btn-cancel { background: var(--surface2); color: var(--text2); }
 .btn-save { background: var(--accent); color: #fff; }
 .btn-cancel:active, .btn-save:active { opacity: 0.75; }
+.btn-delete { background: #fee2e2; color: #dc2626; }
+@media (prefers-color-scheme: dark) { .btn-delete { background: #3b1010; color: #fc6060; } }
+.block-edit-btn {
+  width: 30px; height: 30px; border-radius: 8px; border: none;
+  background: transparent; color: var(--text3); font-size: 16px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s, color 0.15s;
+}
+.block-edit-btn:hover { background: var(--surface2); color: var(--text); }
+.block-edit-btn:active { opacity: 0.6; }
+.habit-del { background: none; border: none; color: var(--text3); font-size: 16px; cursor: pointer; padding: 4px 6px; border-radius: 6px; }
+.habit-del:active { opacity: 0.5; }
 
 /* ── FAB ── */
 .fab {
@@ -393,7 +405,7 @@ body {
 <div class="modal-overlay" id="modal-block">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Add time block</div>
+    <div class="modal-title" id="modal-block-title">Add time block</div>
     <div class="field"><label>Name</label><input id="b-name" placeholder="e.g. Morning workout" /></div>
     <div class="field">
       <label>Time <span id="time-display" style="color:var(--accent);font-weight:600;margin-left:6px"></span></label>
@@ -406,7 +418,7 @@ body {
     </div>
     <div class="field"><label>Icon</label><div class="emoji-grid" id="emoji-grid"></div></div>
     <div class="field"><label>Color</label><div class="color-grid" id="color-grid"></div></div>
-    <div class="modal-actions">
+    <div class="modal-actions" id="modal-block-actions">
       <button class="btn-cancel" onclick="closeModals()">Cancel</button>
       <button class="btn-save" onclick="saveBlock()">Save</button>
     </div>
@@ -417,9 +429,9 @@ body {
 <div class="modal-overlay" id="modal-habit">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Add habit</div>
+    <div class="modal-title" id="modal-habit-title">Add habit</div>
     <div class="field"><label>Habit name</label><input id="h-name" placeholder="e.g. No phone before breakfast" /></div>
-    <div class="modal-actions">
+    <div class="modal-actions" id="modal-habit-actions">
       <button class="btn-cancel" onclick="closeModals()">Cancel</button>
       <button class="btn-save" onclick="saveHabit()">Save</button>
     </div>
@@ -629,6 +641,8 @@ function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m=>
 
 // ── TIME PICKER ───────────────────────────────────────────────
 const TP = { h:7, m:0, ampm:'AM' };
+let editingBlockId = null;
+let editingHabitId = null;
 
 function initTimePicker() {
   const hours  = Array.from({length:12},(_,i)=>i+1);
@@ -679,20 +693,73 @@ function getPickedTime() {
 }
 
 function openAddBlock() {
+  editingBlockId = null;
   document.getElementById('b-name').value='';
-  // default to current hour
+  document.getElementById('modal-block-title').textContent='Add time block';
+  document.getElementById('modal-block-actions').innerHTML=`
+    <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+    <button class="btn-save" onclick="saveBlock()">Save</button>`;
   const now = new Date();
   let h = now.getHours(); const ampm = h>=12?'PM':'AM';
   h = h%12||12;
   TP.h=h; TP.m=0; TP.ampm=ampm;
+  selectedEmoji='☀️'; selectedColor='amber';
   renderEmojiGrid(); renderColorGrid();
   document.getElementById('modal-block').classList.add('open');
   setTimeout(()=>{ initTimePicker(); document.getElementById('b-name').focus(); }, 80);
 }
+
+function openEditBlock(dk, id) {
+  const b = (state.blocks[dk]||[]).find(x=>x.id===id);
+  if (!b) return;
+  editingBlockId = id;
+  document.getElementById('b-name').value = b.name;
+  document.getElementById('modal-block-title').textContent = 'Edit block';
+  document.getElementById('modal-block-actions').innerHTML=`
+    <button class="btn-delete" onclick="deleteBlock('${dk}','${id}')">Delete</button>
+    <button class="btn-save" onclick="saveBlock()">Save</button>`;
+  const match = b.time ? b.time.match(/(\d+):(\d+)\s*(AM|PM)/i) : null;
+  if (match) { TP.h=parseInt(match[1]); TP.m=parseInt(match[2]); TP.ampm=match[3].toUpperCase(); }
+  else { TP.h=12; TP.m=0; TP.ampm='PM'; }
+  selectedEmoji = b.emoji||'🎯';
+  selectedColor = b.color||'amber';
+  renderEmojiGrid(); renderColorGrid();
+  document.getElementById('modal-block').classList.add('open');
+  setTimeout(()=>{ initTimePicker(); document.getElementById('b-name').focus(); }, 80);
+}
+
+function deleteBlock(dk, id) {
+  state.blocks[dk] = (state.blocks[dk]||[]).filter(x=>x.id!==id);
+  saveState(); closeModals(); render();
+}
+
 function openAddHabit() {
+  editingHabitId = null;
   document.getElementById('h-name').value='';
+  document.getElementById('modal-habit-title').textContent='Add habit';
+  document.getElementById('modal-habit-actions').innerHTML=`
+    <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+    <button class="btn-save" onclick="saveHabit()">Save</button>`;
   document.getElementById('modal-habit').classList.add('open');
   setTimeout(()=>document.getElementById('h-name').focus(),80);
+}
+
+function openEditHabit(id) {
+  const h = state.habits.find(x=>x.id===id);
+  if (!h) return;
+  editingHabitId = id;
+  document.getElementById('h-name').value = h.name;
+  document.getElementById('modal-habit-title').textContent = 'Edit habit';
+  document.getElementById('modal-habit-actions').innerHTML=`
+    <button class="btn-delete" onclick="deleteHabit('${id}')">Delete</button>
+    <button class="btn-save" onclick="saveHabit()">Save</button>`;
+  document.getElementById('modal-habit').classList.add('open');
+  setTimeout(()=>document.getElementById('h-name').focus(),80);
+}
+
+function deleteHabit(id) {
+  state.habits = state.habits.filter(x=>x.id!==id);
+  saveState(); closeModals(); render();
 }
 
 function renderEmojiGrid() {
@@ -713,13 +780,23 @@ function saveBlock() {
   if (!name) return;
   const time=getPickedTime();
   if (!state.blocks[selectedDay]) state.blocks[selectedDay]=[];
-  state.blocks[selectedDay].push({id:`c${Date.now()}`,name,time,color:selectedColor,emoji:selectedEmoji,done:false});
+  if (editingBlockId) {
+    const b=state.blocks[selectedDay].find(x=>x.id===editingBlockId);
+    if (b) { b.name=name; b.time=time; b.color=selectedColor; b.emoji=selectedEmoji; }
+  } else {
+    state.blocks[selectedDay].push({id:`c${Date.now()}`,name,time,color:selectedColor,emoji:selectedEmoji,done:false});
+  }
   saveState(); closeModals(); render();
 }
 function saveHabit() {
   const name=document.getElementById('h-name').value.trim();
   if (!name) return;
-  state.habits.push({id:`h${Date.now()}`,name});
+  if (editingHabitId) {
+    const h=state.habits.find(x=>x.id===editingHabitId);
+    if (h) h.name=name;
+  } else {
+    state.habits.push({id:`h${Date.now()}`,name});
+  }
   saveState(); closeModals(); render();
 }
 
@@ -838,6 +915,7 @@ function renderDay(dates) {
             <div class="block-name">${b.name}</div>
             ${b.time?`<div class="block-time">${b.time}</div>`:''}
           </div>
+          <button class="block-edit-btn" onclick="event.stopPropagation();openEditBlock('${selectedDay}','${b.id}')">✎</button>
           <div class="block-check" style="border-color:${b.done?'':c.dot}">${b.done?'✓':''}</div>
         </div>`;
       }).join('')
@@ -913,6 +991,7 @@ function renderHabits(dates) {
             return `<div class="h-dot ${done?'done':''}" onclick="toggleHabit('${h.id}','${dk}',this)">${done?'✓':''}</div>`;
           }).join('')}</div>
           <div class="habit-streak">${s>0?`🔥${s}`:'-'}</div>
+          <button class="habit-del" onclick="openEditHabit('${h.id}')" title="Edit">✎</button>
         </div>`;
       }).join('')}
     </div>`;

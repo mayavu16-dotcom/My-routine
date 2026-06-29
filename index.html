@@ -821,7 +821,10 @@ body {
     <div class="field"><label>Name</label><input id="b-name" placeholder="e.g. Morning workout" style="font-size:16px" /></div>
 
     <div class="field">
-      <label>Time <span id="time-display" style="color:var(--accent);font-weight:600;margin-left:6px"></span></label>
+      <label style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Time <span id="time-display" style="color:var(--accent);font-weight:600;margin-left:6px"></span></span>
+        <span id="time-original" style="font-size:11px;color:var(--text3);font-weight:500;"></span>
+      </label>
       <div class="time-picker" id="time-picker" style="height:120px;">
         <div class="tp-selector"></div>
         <div class="tp-col" id="tp-hour"></div>
@@ -1467,6 +1470,8 @@ function openAddBlock() {
   editingBlockId = null;
   document.getElementById('b-name').value='';
   document.getElementById('modal-block-title').textContent='Add time block';
+  const orig = document.getElementById('time-original');
+  if (orig) orig.textContent = '';
   document.getElementById('modal-block-actions').innerHTML=`
     <button class="btn-cancel" onclick="closeModals()">Cancel</button>
     <button class="btn-save" onclick="saveBlock()">Save</button>`;
@@ -1487,6 +1492,9 @@ function openEditBlock(dk, id) {
   editingBlockDk = dk;
   document.getElementById('b-name').value = b.name;
   document.getElementById('modal-block-title').textContent = 'Edit block';
+  // show the currently saved time as a reference
+  const orig = document.getElementById('time-original');
+  if (orig) orig.textContent = b.time ? `Currently ${b.time}` : '';
   document.getElementById('modal-block-actions').innerHTML=`
     <button class="btn-delete" onclick="deleteBlock('${dk}','${id}')">Delete</button>
     <button class="btn-save" onclick="saveBlock()">Save</button>`;

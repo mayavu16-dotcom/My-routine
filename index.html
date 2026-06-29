@@ -179,12 +179,12 @@ body {
   margin-bottom: 16px; border-left: 3px solid var(--accent);
 }
 .verse-text {
-  font-size: 15px; color: var(--text); line-height: 1.75;
-  font-family: var(--font-serif); font-style: italic; font-weight: 600;
-  margin-bottom: 8px; letter-spacing: 0.01em;
+  font-size: 18px; color: var(--text); line-height: 1.75;
+  font-family: var(--font-serif); font-style: italic; font-weight: 700;
+  margin-bottom: 10px; letter-spacing: 0.01em;
 }
 .verse-ref {
-  font-size: 12px; font-weight: 700; color: var(--accent);
+  font-size: 13px; font-weight: 700; color: var(--accent);
   text-align: right; letter-spacing: 0.06em; text-transform: uppercase;
   font-family: var(--font);
 }
@@ -246,7 +246,7 @@ body {
 .blocks-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 24px; }
 .block-item {
   background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
-  padding: 12px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+  padding: 13px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer;
   transition: transform 0.1s, opacity 0.2s, box-shadow 0.1s;
   position: relative; overflow: visible;
 }
@@ -273,9 +273,9 @@ body {
 .drag-handle span { display: block; width: 14px; height: 2px; background: var(--text3); border-radius: 1px; }
 .block-emoji { font-size: 20px; flex-shrink: 0; width: 32px; text-align: center; }
 .block-info { flex: 1; min-width: 0; }
-.block-name { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.1px; }
+.block-name { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
 .block-item.done .block-name { text-decoration: line-through; color: var(--text3); }
-.block-time { font-size: 11px; color: var(--text3); margin-top: 2px; letter-spacing: 0.02em; text-transform: uppercase; font-weight: 500; }
+.block-time { font-size: 13px; color: var(--text2); margin-top: 3px; letter-spacing: 0.01em; font-weight: 700; }
 .block-check {
   width: 24px; height: 24px; border-radius: 50%;
   border: 1.5px solid var(--border2); display: flex; align-items: center;
@@ -294,6 +294,17 @@ body {
 .block-note-bullets li { padding: 1px 0; padding-left: 14px; position: relative; }
 .block-note-bullets li::before { content: '•'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
 /* ── NOTE FIELD IN MODAL ── */
+.block-item.overdue { border-color: var(--warning, #d97706); }
+.block-item.overdue .block-time { color: var(--warning, #d97706); }
+.overdue-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--warning, #d97706); flex-shrink: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
 .note-field-wrap { position: relative; }
 .note-field-wrap textarea {
   width: 100%; background: var(--surface2); border: 1px solid var(--border2);
@@ -1910,6 +1921,21 @@ function renderDay(dates) {
         const hasBottom = hasNotes || noteOpen;
         const blockRadius = hasBottom ? 'var(--radius) var(--radius) 0 0' : 'var(--radius)';
 
+        // overdue: today, not done, has a time that has passed
+        let isOverdue = false;
+        if (isToday(selDate) && !b.done && b.time) {
+          const match = b.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (match) {
+            let hr = parseInt(match[1]), mn = parseInt(match[2]);
+            const pm = match[3].toUpperCase() === 'PM';
+            if (pm && hr !== 12) hr += 12;
+            if (!pm && hr === 12) hr = 0;
+            const blockMins = hr * 60 + mn;
+            const nowMins = new Date().getHours() * 60 + new Date().getMinutes();
+            isOverdue = nowMins > blockMins + 15; // 15 min grace
+          }
+        }
+
         // bullet note display (when panel is closed but notes exist)
         const bulletHTML = (hasNotes && !noteOpen) ? `<div class="block-note-row">
           <ul class="block-note-bullets">${b.notes.map(n=>`<li>${n}</li>`).join('')}</ul>
@@ -1939,7 +1965,7 @@ function renderDay(dates) {
         </div>` : '';
 
         return `<div style="margin-bottom:8px;">
-          <div class="block-item ${b.done?'done':''}" id="bi-${b.id}"
+          <div class="block-item ${b.done?'done':''} ${isOverdue?'overdue':''}" id="bi-${b.id}"
             style="border-radius:${blockRadius};margin-bottom:0;"
             draggable="true"
             ondragstart="onDragStart(event,'${b.id}')"
@@ -1956,9 +1982,10 @@ function renderDay(dates) {
             <div class="block-emoji" onclick="toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.emoji||'🎯'}</div>
             <div class="block-info" onclick="toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">
               <div class="block-name">${b.name}</div>
-              ${b.time?`<div class="block-time">${b.time}</div>`:''}
+              ${b.time?`<div class="block-time">${b.time}${isOverdue?' — overdue':''}</div>`:''}
             </div>
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;">
+              ${isOverdue?'<div class="overdue-dot"></div>':''}
               <button class="note-icon-btn ${hasNotes?'has-note':''}" onclick="event.stopPropagation();toggleNotePanel('${selectedDay}','${b.id}')" title="${noteOpen?'Close note':'Add note'}">📝</button>
               <button class="block-edit-btn" onclick="event.stopPropagation();openEditBlock('${selectedDay}','${b.id}')" title="Edit">✎</button>
               <div class="block-check" style="border-color:${b.done?'':c.dot}" onclick="event.stopPropagation();toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.done?'✓':''}</div>

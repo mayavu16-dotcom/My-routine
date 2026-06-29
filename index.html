@@ -163,7 +163,7 @@ body {
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
 /* ── VIEWS ── */
-.view { display: none; padding: 16px 16px calc(90px + var(--safe-bottom)); }
+.view { display: none; padding: 16px 16px calc(32px + var(--safe-bottom)); }
 .view.active { display: block; }
 
 /* ── RING ── */
@@ -557,16 +557,7 @@ body {
 .habit-del { background: none; border: none; color: var(--text3); font-size: 16px; cursor: pointer; padding: 4px 6px; border-radius: 6px; }
 .habit-del:active { opacity: 0.5; }
 
-/* ── FAB ── */
-.fab {
-  position: fixed; bottom: calc(22px + var(--safe-bottom)); right: 18px;
-  width: 54px; height: 54px; border-radius: 50%; background: var(--accent);
-  color: #fff; border: none; font-size: 28px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 20px rgba(59,124,244,0.45); z-index: 50;
-  transition: transform 0.15s;
-}
-.fab:active { transform: scale(0.9); }
+
 
 /* ── PERFECT DAY BANNER ── */
 .perfect-banner {
@@ -753,37 +744,49 @@ body {
     <div class="section-title" id="day-heading">Today</div>
     <div style="display:flex;gap:8px;align-items:center;">
       <button class="trash-btn" id="trash-btn" onclick="enterSelectMode()" title="Delete blocks">🗑</button>
-      <button class="add-btn" id="copy-day-btn" onclick="openCopyDay()" title="Copy day to other days" style="background:var(--surface2);color:var(--text2);border:0.5px solid var(--border2);">Copy day</button>
+      <button class="add-btn" id="copy-day-btn" onclick="openCopyModal()" style="background:var(--surface2);color:var(--text2);border:0.5px solid var(--border2);">Copy</button>
       <button class="add-btn" onclick="openAddBlock()">+ Add</button>
     </div>
   </div>
   <div class="blocks-list" id="blocks-list"></div>
 </div>
 
-<!-- COPY DAY MODAL -->
-<div class="modal-overlay" id="modal-copy-day">
+<!-- UNIFIED COPY MODAL -->
+<div class="modal-overlay" id="modal-copy">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Copy day to…</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">Select which days should get the same blocks as <strong id="copy-day-src-label"></strong>. Existing blocks on those days will be kept — copied blocks are added on top.</div>
-    <div id="copy-day-checkboxes" style="display:flex;flex-direction:column;gap:8px;margin-bottom:4px;"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModals()">Cancel</button>
-      <button class="btn-save" onclick="applyCopyDay()">Copy</button>
-    </div>
-  </div>
-</div>
+    <div class="modal-title">Copy to other days</div>
 
-<!-- DUPLICATE BLOCK MODAL -->
-<div class="modal-overlay" id="modal-dup-block">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Add to other days</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">Add <strong id="dup-block-label"></strong> to:</div>
-    <div id="dup-block-checkboxes" style="display:flex;flex-direction:column;gap:8px;margin-bottom:4px;"></div>
+    <!-- Step 1: what to copy -->
+    <div class="field">
+      <label>What to copy</label>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);cursor:pointer;font-size:14px;color:var(--text);">
+          <input type="radio" name="copy-mode" value="all" checked style="accent-color:var(--accent);width:18px;height:18px;flex-shrink:0;" onchange="renderCopyBlockPicker()" />
+          <div><div style="font-weight:600;">Entire day's schedule</div><div style="font-size:12px;color:var(--text3);margin-top:1px;">Copy all blocks from this day</div></div>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);cursor:pointer;font-size:14px;color:var(--text);">
+          <input type="radio" name="copy-mode" value="pick" style="accent-color:var(--accent);width:18px;height:18px;flex-shrink:0;" onchange="renderCopyBlockPicker()" />
+          <div><div style="font-weight:600;">Specific blocks</div><div style="font-size:12px;color:var(--text3);margin-top:1px;">Choose which blocks to copy</div></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Block picker (shown when "specific" selected) -->
+    <div id="copy-block-picker" style="display:none;" class="field">
+      <label>Select blocks</label>
+      <div id="copy-block-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+
+    <!-- Step 2: which days -->
+    <div class="field">
+      <label>Copy to</label>
+      <div id="copy-day-checkboxes" style="display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModals()">Cancel</button>
-      <button class="btn-save" onclick="applyDupBlock()">Add to days</button>
+      <button class="btn-save" onclick="applyUnifiedCopy()">Copy</button>
     </div>
   </div>
 </div>
@@ -874,7 +877,6 @@ body {
   </div>
 </div>
 
-<button class="fab" onclick="openAddBlock()">+</button>
 <div id="undo-toast" style="display:none"></div>
 
 <script>
@@ -1487,7 +1489,6 @@ function openEditBlock(dk, id) {
   document.getElementById('modal-block-title').textContent = 'Edit block';
   document.getElementById('modal-block-actions').innerHTML=`
     <button class="btn-delete" onclick="deleteBlock('${dk}','${id}')">Delete</button>
-    <button class="btn-cancel" style="flex:0 0 auto;padding:13px 14px;" onclick="closeModals();setTimeout(()=>openDupBlock('${dk}','${id}'),80)">Add to days</button>
     <button class="btn-save" onclick="saveBlock()">Save</button>`;
   const match = b.time ? b.time.match(/(\d+):(\d+)\s*(AM|PM)/i) : null;
   if (match) { TP.h=parseInt(match[1]); TP.m=parseInt(match[2]); TP.ampm=match[3].toUpperCase(); }
@@ -1929,76 +1930,75 @@ function renderBulletEditor(id, notes) {
   });
 }
 
-// ── COPY DAY / DUPLICATE BLOCK ────────────────────────────────
-function dayCheckboxesHTML(excludeDk, labelPrefix) {
+// ── UNIFIED COPY ──────────────────────────────────────────────
+function dayCheckboxesHTML(excludeDk) {
   const dates = getWeekDates(weekOffset);
   return dates.map(d => {
     const dk = dateKey(d);
     if (dk === excludeDk) return '';
     const label = `${DAYS_SHORT[d.getDay()]} ${d.toLocaleString('default',{month:'short'})} ${d.getDate()}`;
-    return `<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:14px;color:var(--text);">
+    const isTod = isToday(d);
+    return `<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:14px;color:var(--text);">
       <input type="checkbox" value="${dk}" style="width:18px;height:18px;accent-color:var(--accent);flex-shrink:0;" />
-      ${label}
+      <span>${label}${isTod?' <span style="font-size:11px;color:var(--accent);font-weight:600;">Today</span>':''}</span>
     </label>`;
   }).filter(Boolean).join('');
 }
 
-function openCopyDay() {
+function openCopyModal() {
   const blocks = state.blocks[selectedDay] || [];
-  if (!blocks.length) { alert('No blocks to copy on this day.'); return; }
-  const selDate = getWeekDates(weekOffset).find(d => dateKey(d) === selectedDay) || new Date();
-  const label = `${DAYS_SHORT[selDate.getDay()]} ${selDate.toLocaleString('default',{month:'short'})} ${selDate.getDate()}`;
-  document.getElementById('copy-day-src-label').textContent = label;
-  document.getElementById('copy-day-checkboxes').innerHTML = dayCheckboxesHTML(selectedDay, '');
-  document.getElementById('modal-copy-day').classList.add('open');
+  if (!blocks.length) { return; }
+  // reset to "all" mode
+  const allRadio = document.querySelector('#modal-copy input[value="all"]');
+  if (allRadio) allRadio.checked = true;
+  // populate day checkboxes
+  document.getElementById('copy-day-checkboxes').innerHTML = dayCheckboxesHTML(selectedDay);
+  // populate block list
+  renderCopyBlockPicker();
+  document.getElementById('modal-copy').classList.add('open');
 }
 
-function applyCopyDay() {
-  const checked = [...document.querySelectorAll('#copy-day-checkboxes input:checked')].map(i => i.value);
-  if (!checked.length) { closeModals(); return; }
-  const srcBlocks = state.blocks[selectedDay] || [];
-  pushUndo('Copy day undone');
-  checked.forEach(dk => {
+function renderCopyBlockPicker() {
+  const mode = document.querySelector('#modal-copy input[name="copy-mode"]:checked')?.value || 'all';
+  const picker = document.getElementById('copy-block-picker');
+  picker.style.display = mode === 'pick' ? 'block' : 'none';
+  if (mode === 'pick') {
+    const blocks = state.blocks[selectedDay] || [];
+    document.getElementById('copy-block-list').innerHTML = blocks.map(b =>
+      `<label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:14px;color:var(--text);">
+        <input type="checkbox" value="${b.id}" style="width:18px;height:18px;accent-color:var(--accent);flex-shrink:0;" checked />
+        <span>${b.emoji||'🎯'} ${b.name}${b.time?` <span style="font-size:12px;color:var(--text3);">${b.time}</span>`:''}</span>
+      </label>`
+    ).join('');
+  }
+}
+
+function applyUnifiedCopy() {
+  const mode = document.querySelector('#modal-copy input[name="copy-mode"]:checked')?.value || 'all';
+  const targetDays = [...document.querySelectorAll('#copy-day-checkboxes input:checked')].map(i => i.value);
+  if (!targetDays.length) { closeModals(); return; }
+
+  let srcBlocks = state.blocks[selectedDay] || [];
+  if (mode === 'pick') {
+    const pickedIds = new Set([...document.querySelectorAll('#copy-block-list input:checked')].map(i => i.value));
+    srcBlocks = srcBlocks.filter(b => pickedIds.has(b.id));
+  }
+  if (!srcBlocks.length) { closeModals(); return; }
+
+  pushUndo(`Copy undone`);
+  targetDays.forEach(dk => {
     if (!state.blocks[dk]) state.blocks[dk] = [];
     srcBlocks.forEach(b => {
-      // skip if same name already exists on that day
       if (!state.blocks[dk].find(x => x.name === b.name)) {
-        state.blocks[dk].push({ ...b, id: `copy-${Date.now()}-${Math.random().toString(36).slice(2)}`, done: false });
+        state.blocks[dk].push({ ...b, id:`copy-${Date.now()}-${Math.random().toString(36).slice(2)}`, done:false });
       }
     });
   });
   saveState(); closeModals(); render();
-  showUndoToast(`Copied to ${checked.length} day${checked.length>1?'s':''}`);
+  const what = mode === 'all' ? `${srcBlocks.length} block${srcBlocks.length>1?'s':''}` : `${srcBlocks.length} block${srcBlocks.length>1?'s':''}`;
+  showUndoToast(`Copied ${what} to ${targetDays.length} day${targetDays.length>1?'s':''}`);
 }
 
-function openDupBlock(dk, id) {
-  const b = (state.blocks[dk]||[]).find(x=>x.id===id);
-  if (!b) return;
-  document.getElementById('dup-block-label').textContent = `"${b.name}"`;
-  document.getElementById('dup-block-checkboxes').innerHTML = dayCheckboxesHTML(dk, '');
-  document.getElementById('modal-dup-block').dataset.dk = dk;
-  document.getElementById('modal-dup-block').dataset.id = id;
-  document.getElementById('modal-dup-block').classList.add('open');
-}
-
-function applyDupBlock() {
-  const modal = document.getElementById('modal-dup-block');
-  const dk = modal.dataset.dk;
-  const id = modal.dataset.id;
-  const b = (state.blocks[dk]||[]).find(x=>x.id===id);
-  if (!b) { closeModals(); return; }
-  const checked = [...document.querySelectorAll('#dup-block-checkboxes input:checked')].map(i=>i.value);
-  if (!checked.length) { closeModals(); return; }
-  pushUndo('Duplicate undone');
-  checked.forEach(targetDk => {
-    if (!state.blocks[targetDk]) state.blocks[targetDk] = [];
-    if (!state.blocks[targetDk].find(x=>x.name===b.name)) {
-      state.blocks[targetDk].push({ ...b, id:`dup-${Date.now()}-${Math.random().toString(36).slice(2)}`, done:false });
-    }
-  });
-  saveState(); closeModals(); render();
-  showUndoToast(`"${b.name}" added to ${checked.length} day${checked.length>1?'s':''}`);
-}
 
 // ── RENDER ─────────────────────────────────────────────────────
 function render() {

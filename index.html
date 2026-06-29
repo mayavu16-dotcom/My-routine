@@ -264,13 +264,7 @@ body {
   40% { transform: scale(1.03); }
   100% { transform: scale(1); }
 }
-.drag-handle {
-  color: var(--text3); font-size: 16px; cursor: grab; flex-shrink: 0;
-  padding: 2px 2px; touch-action: none; line-height: 1;
-  display: flex; flex-direction: column; gap: 2px; align-items: center;
-}
-.drag-handle:active { cursor: grabbing; }
-.drag-handle span { display: block; width: 14px; height: 2px; background: var(--text3); border-radius: 1px; }
+
 .block-emoji { font-size: 20px; flex-shrink: 0; width: 32px; text-align: center; }
 .block-info { flex: 1; min-width: 0; }
 .block-name { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
@@ -710,7 +704,6 @@ body {
   .block-edit-btn { width: 24px; height: 24px; font-size: 13px; }
   .block-check { width: 22px; height: 22px; font-size: 12px; }
   .note-icon-btn { font-size: 13px; }
-  .drag-handle span { width: 12px; }
 
   /* section head */
   .section-title { font-size: 10px; }
@@ -1675,23 +1668,33 @@ function onDrop(e, targetId) {
 let touchDragId = null;
 let touchClone = null;
 let touchStartY = 0;
+let touchStartX = 0;
+let touchDragActive = false;
 function onTouchDragStart(e, id) {
   if (selectMode) return;
   touchDragId = id;
   touchStartY = e.touches[0].clientY;
-  const src = document.getElementById('bi-'+id);
-  if (!src) return;
-  touchClone = src.cloneNode(true);
-  touchClone.style.cssText = `position:fixed;left:${src.getBoundingClientRect().left}px;top:${src.getBoundingClientRect().top}px;width:${src.offsetWidth}px;opacity:0.85;z-index:999;pointer-events:none;transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,0.2);border-radius:12px;`;
-  document.body.appendChild(touchClone);
-  src.style.opacity='0.3';
+  touchStartX = e.touches[0].clientX;
+  touchDragActive = false;
 }
 function onTouchDragMove(e, id) {
-  if (!touchDragId || !touchClone) return;
-  e.preventDefault();
+  if (!touchDragId) return;
   const dy = e.touches[0].clientY - touchStartY;
+  const dx = e.touches[0].clientX - touchStartX;
+  // only activate drag after moving 8px vertically — prevents tap from triggering drag
+  if (!touchDragActive && Math.abs(dy) < 8) return;
+  if (!touchDragActive) {
+    touchDragActive = true;
+    const src = document.getElementById('bi-'+id);
+    if (!src) return;
+    touchClone = src.cloneNode(true);
+    touchClone.style.cssText = `position:fixed;left:${src.getBoundingClientRect().left}px;top:${src.getBoundingClientRect().top}px;width:${src.offsetWidth}px;opacity:0.85;z-index:999;pointer-events:none;transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,0.2);border-radius:12px;`;
+    document.body.appendChild(touchClone);
+    src.style.opacity='0.3';
+  }
+  if (!touchClone) return;
+  e.preventDefault();
   touchClone.style.transform = `translateY(${dy}px) scale(1.02)`;
-  // find which block we're hovering
   document.querySelectorAll('.block-item').forEach(el=>el.classList.remove('drag-over'));
   const touch = e.touches[0];
   const els = document.elementsFromPoint(touch.clientX, touch.clientY);
@@ -1706,6 +1709,8 @@ function onTouchDragEnd(e, id) {
   const src = document.getElementById('bi-'+id);
   if (src) src.style.opacity='';
   if (touchClone) { touchClone.remove(); touchClone=null; }
+  if (!touchDragActive) { touchDragId=null; return; } // was just a tap
+  touchDragActive = false;
   // find drop target
   const touch = e.changedTouches[0];
   const els = document.elementsFromPoint(touch.clientX, touch.clientY);
@@ -2142,16 +2147,12 @@ function renderDay(dates) {
             ondragstart="onDragStart(event,'${b.id}')"
             ondragend="onDragEnd(event,'${b.id}')"
             ondragover="onDragOver(event,'${b.id}')"
-            ondrop="onDrop(event,'${b.id}')">
-            <div class="drag-handle"
-              onclick="event.stopPropagation()"
-              ontouchstart="event.stopPropagation();onTouchDragStart(event,'${b.id}')"
-              ontouchmove="event.stopPropagation();onTouchDragMove(event,'${b.id}')"
-              ontouchend="event.stopPropagation();onTouchDragEnd(event,'${b.id}')">
-              <span></span><span></span><span></span>
-            </div>
-            <div class="block-emoji" onclick="toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.emoji||'🎯'}</div>
-            <div class="block-info" onclick="toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">
+            ondrop="onDrop(event,'${b.id}')"
+            ontouchstart="onTouchDragStart(event,'${b.id}')"
+            ontouchmove="onTouchDragMove(event,'${b.id}')"
+            ontouchend="onTouchDragEnd(event,'${b.id}')">
+            <div class="block-emoji" onclick="event.stopPropagation();toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.emoji||'🎯'}</div>
+            <div class="block-info" onclick="event.stopPropagation();toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">
               <div class="block-name">${b.name}</div>
               ${b.time?`<div class="block-time">${b.time}</div>`:''}
             </div>

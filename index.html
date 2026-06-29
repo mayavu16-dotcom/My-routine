@@ -249,6 +249,7 @@ body {
   padding: 13px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer;
   transition: transform 0.1s, opacity 0.2s, box-shadow 0.1s;
   position: relative; overflow: visible;
+  touch-action: pan-y;
 }
 .block-item:active { transform: scale(0.98); }
 .block-item.done { opacity: 0.4; }
@@ -1713,14 +1714,14 @@ function onDrop(e, targetId) {
   showUndoToast('Order changed');
 }
 
-// touch-based drag (mobile)
+// touch-based drag (mobile) — lightweight, no cloning
 let touchDragId = null;
-let touchClone = null;
 let touchStartY = 0;
 let touchStartX = 0;
 let touchDragActive = false;
 let touchHoldTimer = null;
-let touchHoldReady = false; // true only after 200ms hold
+let touchHoldReady = false;
+let touchCurrentTarget = null; // block id we're hovering over
 
 function onTouchDragStart(e, id) {
   if (selectMode) return;
@@ -1729,12 +1730,11 @@ function onTouchDragStart(e, id) {
   touchStartX = e.touches[0].clientX;
   touchDragActive = false;
   touchHoldReady = false;
-  // require a 200ms hold before drag is allowed — this separates scroll from drag
+  touchCurrentTarget = null;
   touchHoldTimer = setTimeout(() => {
     touchHoldReady = true;
-    // give a subtle haptic hint if available
     if (navigator.vibrate) navigator.vibrate(20);
-  }, 200);
+  }, 180);
 }
 
 function onTouchDragMove(e, id) {
@@ -1742,9 +1742,9 @@ function onTouchDragMove(e, id) {
   const dy = e.touches[0].clientY - touchStartY;
   const dx = e.touches[0].clientX - touchStartX;
 
-  // if they moved too far before hold timer fired, cancel — they're scrolling
+  // cancel if moved before hold fired — user is scrolling
   if (!touchHoldReady) {
-    if (Math.abs(dy) > 6 || Math.abs(dx) > 6) {
+    if (Math.abs(dy) > 5 || Math.abs(dx) > 5) {
       clearTimeout(touchHoldTimer);
       touchHoldTimer = null;
       touchDragId = null;
@@ -1752,26 +1752,32 @@ function onTouchDragMove(e, id) {
     return;
   }
 
-  // hold confirmed — now activate drag on first significant vertical move
-  if (!touchDragActive && Math.abs(dy) < 4) return;
+  // activate drag on first vertical movement after hold
+  if (!touchDragActive && Math.abs(dy) < 3) return;
   if (!touchDragActive) {
     touchDragActive = true;
     const src = document.getElementById('bi-'+id);
-    if (!src) return;
-    touchClone = src.cloneNode(true);
-    touchClone.style.cssText = `position:fixed;left:${src.getBoundingClientRect().left}px;top:${src.getBoundingClientRect().top}px;width:${src.offsetWidth}px;opacity:0.85;z-index:999;pointer-events:none;transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,0.2);border-radius:12px;`;
-    document.body.appendChild(touchClone);
-    src.style.opacity='0.3';
+    if (src) {
+      // just lift the element in place — no clone needed
+      src.style.cssText += ';opacity:0.7;transform:scale(1.03) translateY(0px);transition:none;z-index:10;position:relative;will-change:transform;box-shadow:0 6px 20px rgba(0,0,0,0.15);';
+    }
   }
-  if (!touchClone) return;
+
   e.preventDefault();
-  touchClone.style.transform = `translateY(${dy}px) scale(1.02)`;
-  document.querySelectorAll('.block-item').forEach(el=>el.classList.remove('drag-over'));
+
+  // move the source element visually
+  const src = document.getElementById('bi-'+id);
+  if (src) src.style.transform = `scale(1.03) translateY(${dy}px)`;
+
+  // find drop target
+  document.querySelectorAll('.block-item').forEach(el => el.classList.remove('drag-over'));
   const touch = e.touches[0];
   const els = document.elementsFromPoint(touch.clientX, touch.clientY);
   for (const el of els) {
-    if (el.classList.contains('block-item') && el.id !== 'bi-'+touchDragId) {
-      el.classList.add('drag-over'); break;
+    if (el.classList.contains('block-item') && el.id && el.id !== 'bi-'+touchDragId) {
+      el.classList.add('drag-over');
+      touchCurrentTarget = el.id.replace('bi-','');
+      break;
     }
   }
 }
@@ -1780,32 +1786,40 @@ function onTouchDragEnd(e, id) {
   clearTimeout(touchHoldTimer);
   touchHoldTimer = null;
   touchHoldReady = false;
-  if (!touchDragId) return;
+
+  // always reset the source element style
   const src = document.getElementById('bi-'+id);
-  if (src) src.style.opacity='';
-  if (touchClone) { touchClone.remove(); touchClone=null; }
-  if (!touchDragActive) { touchDragId=null; return; }
+  if (src) {
+    src.style.opacity = '';
+    src.style.transform = '';
+    src.style.zIndex = '';
+    src.style.position = '';
+    src.style.willChange = '';
+    src.style.boxShadow = '';
+    src.style.transition = '';
+  }
+
+  document.querySelectorAll('.block-item').forEach(el => el.classList.remove('drag-over'));
+
+  if (!touchDragActive || !touchDragId) { touchDragId=null; touchDragActive=false; touchCurrentTarget=null; return; }
   touchDragActive = false;
-  const touch = e.changedTouches[0];
-  const els = document.elementsFromPoint(touch.clientX, touch.clientY);
-  for (const el of els) {
-    if (el.classList.contains('block-item') && el.id && el.id !== 'bi-'+touchDragId) {
-      const targetId = el.id.replace('bi-','');
-      const blocks = state.blocks[selectedDay];
-      const srcIdx = blocks.findIndex(b=>b.id===touchDragId);
-      const tgtIdx = blocks.findIndex(b=>b.id===targetId);
-      if (srcIdx>=0&&tgtIdx>=0) {
-        pushUndo('Reorder undone');
-        const [moved]=blocks.splice(srcIdx,1);
-        blocks.splice(tgtIdx,0,moved);
-        saveState();
-        showUndoToast('Order changed');
-      }
-      break;
+
+  if (touchCurrentTarget) {
+    const blocks = state.blocks[selectedDay];
+    const srcIdx = blocks.findIndex(b=>b.id===touchDragId);
+    const tgtIdx = blocks.findIndex(b=>b.id===touchCurrentTarget);
+    if (srcIdx>=0 && tgtIdx>=0 && srcIdx!==tgtIdx) {
+      pushUndo('Reorder undone');
+      const [moved] = blocks.splice(srcIdx,1);
+      blocks.splice(tgtIdx,0,moved);
+      saveState();
+      showUndoToast('Order changed');
     }
   }
-  document.querySelectorAll('.block-item').forEach(el=>el.classList.remove('drag-over'));
-  touchDragId=null; render();
+
+  touchDragId = null;
+  touchCurrentTarget = null;
+  render();
 }
 
 // ── UNDO ──────────────────────────────────────────────────────

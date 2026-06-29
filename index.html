@@ -7,160 +7,319 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="My Routine" />
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-<meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)" />
 <title>My Routine</title>
 <style>
+:root {
+  --bg: #f6f6f4;
+  --surface: #ffffff;
+  --surface2: #f0efec;
+  --surface3: #e8e7e3;
+  --text: #1a1a18;
+  --text2: #6b6b67;
+  --text3: #a0a09b;
+  --border: rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.12);
+  --accent: #3b7cf4;
+  --accent-bg: #eef3fe;
+  --accent-text: #1a4fb5;
+  --success: #16a362;
+  --success-bg: #e6f7ef;
+  --success-text: #0a6b3f;
+  --warning: #d97706;
+  --warning-bg: #fef3e2;
+  --danger: #e53e3e;
+  --streak: #f97316;
+  --streak-bg: #fff4ed;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+@media (prefers-color-scheme: dark) {
   :root {
-    --bg: #f7f7f5;
-    --surface: #ffffff;
-    --surface2: #f0efec;
-    --text: #1a1a18;
-    --text2: #6b6b67;
-    --text3: #a0a09b;
-    --border: rgba(0,0,0,0.08);
-    --border2: rgba(0,0,0,0.14);
-    --accent: #3b7cf4;
-    --accent-bg: #eef3fe;
-    --accent-text: #1a4fb5;
-    --success: #16a362;
-    --success-bg: #e6f7ef;
-    --radius: 10px;
-    --radius-lg: 16px;
-    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --bg: #111111;
+    --surface: #1c1c1a;
+    --surface2: #242422;
+    --surface3: #2e2e2b;
+    --text: #f0efe9;
+    --text2: #9a9a94;
+    --text3: #5a5a56;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --accent: #5b92f6;
+    --accent-bg: #1a2a4a;
+    --accent-text: #93b8fa;
+    --success: #2ec67a;
+    --success-bg: #0d2e1e;
+    --success-text: #5de0a0;
+    --warning: #f59e0b;
+    --warning-bg: #2a1f0a;
+    --danger: #fc6060;
+    --streak: #fb923c;
+    --streak-bg: #2a1500;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #141413;
-      --surface: #1e1e1c;
-      --surface2: #252523;
-      --text: #f0efe9;
-      --text2: #9a9a94;
-      --text3: #5a5a56;
-      --border: rgba(255,255,255,0.08);
-      --border2: rgba(255,255,255,0.14);
-      --accent: #5b92f6;
-      --accent-bg: #1a2a4a;
-      --accent-text: #93b8fa;
-      --success: #2ec67a;
-      --success-bg: #0d2e1e;
-    }
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100dvh;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  /* NAV */
-  .nav {
-    position: sticky; top: 0; z-index: 50;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 16px;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 56px;
-    padding-top: env(safe-area-inset-top);
-  }
-  .nav-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
-  .nav-week { display: flex; align-items: center; gap: 6px; }
-  .nav-btn { background: var(--surface2); border: none; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 16px; color: var(--text); display: flex; align-items: center; justify-content: center; }
-  .nav-btn:active { opacity: 0.6; }
-  .week-label { font-size: 13px; color: var(--text2); min-width: 100px; text-align: center; }
-  /* TAB BAR */
-  .tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); }
-  .tab { flex: 1; padding: 11px 0; font-size: 13px; font-weight: 500; color: var(--text3); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  /* VIEWS */
-  .view { display: none; padding: 16px; }
-  .view.active { display: block; }
-  /* STATS */
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-  .stat-card { background: var(--surface); border-radius: var(--radius-lg); padding: 14px 16px; border: 1px solid var(--border); }
-  .stat-val { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
-  .stat-lbl { font-size: 12px; color: var(--text3); margin-top: 2px; }
-  .progress-bar { height: 3px; background: var(--surface2); border-radius: 2px; margin-top: 8px; overflow: hidden; }
-  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s; }
-  /* SECTION HEADER */
-  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  .section-title { font-size: 13px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
-  .add-btn { background: var(--accent-bg); color: var(--accent-text); border: none; border-radius: 8px; padding: 5px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
-  .add-btn:active { opacity: 0.7; }
-  /* BLOCKS LIST */
-  .blocks-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
-  .block-item {
-    background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border);
-    padding: 13px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  .block-item.done { opacity: 0.45; }
-  .block-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-  .block-info { flex: 1; min-width: 0; }
-  .block-name { font-size: 15px; font-weight: 500; color: var(--text); }
-  .block-item.done .block-name { text-decoration: line-through; color: var(--text3); }
-  .block-time { font-size: 12px; color: var(--text3); margin-top: 1px; }
-  .block-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, border-color 0.15s; }
-  .block-item.done .block-check { background: var(--success); border-color: var(--success); }
-  .check-icon { display: none; color: #fff; font-size: 13px; }
-  .block-item.done .check-icon { display: block; }
-  /* DAY SELECTOR */
-  .day-selector { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
-  .day-selector::-webkit-scrollbar { display: none; }
-  .day-pill { flex-shrink: 0; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border2); background: var(--surface); font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 1px; }
-  .day-pill .d-name { font-size: 11px; font-weight: 500; color: var(--text3); }
-  .day-pill .d-num { font-size: 15px; font-weight: 600; }
-  .day-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .day-pill.active .d-name { color: rgba(255,255,255,0.75); }
-  .day-pill.today-dot::after { content: ''; display: block; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); margin: 0 auto; margin-top: 2px; }
-  .day-pill.active.today-dot::after { background: rgba(255,255,255,0.8); }
-  /* HABITS VIEW */
-  .habit-table { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
-  .habit-row { display: flex; align-items: center; padding: 11px 14px; border-bottom: 1px solid var(--border); gap: 10px; }
-  .habit-row:last-child { border-bottom: none; }
-  .habit-name { font-size: 14px; font-weight: 500; flex: 1; color: var(--text); }
-  .habit-days { display: flex; gap: 4px; }
-  .h-dot { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border2); background: var(--surface2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: var(--text3); transition: background 0.15s, border-color 0.15s; flex-shrink: 0; }
-  .h-dot.done { background: var(--success); border-color: var(--success); color: #fff; }
-  .habit-pct { font-size: 12px; color: var(--text3); min-width: 30px; text-align: right; }
-  .habit-head { display: flex; align-items: center; padding: 8px 14px; background: var(--surface2); gap: 10px; }
-  .habit-head-name { flex: 1; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
-  .habit-day-labels { display: flex; gap: 4px; }
-  .h-day-lbl { width: 28px; text-align: center; font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; }
-  /* MODAL */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: flex-end; justify-content: center; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-width: 540px; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); }
-  .modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 16px; }
-  .modal-title { font-size: 17px; font-weight: 600; margin-bottom: 16px; }
-  .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
-  .field input, .field select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 10px 12px; font-size: 15px; color: var(--text); font-family: var(--font); }
-  .field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .color-grid { display: flex; gap: 8px; flex-wrap: wrap; }
-  .color-swatch { width: 32px; height: 32px; border-radius: 8px; cursor: pointer; border: 3px solid transparent; transition: border-color 0.15s; }
-  .color-swatch.sel { border-color: var(--text); }
-  .modal-actions { display: flex; gap: 10px; margin-top: 6px; }
-  .modal-actions button { flex: 1; padding: 13px; border-radius: var(--radius); border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
-  .btn-cancel { background: var(--surface2); color: var(--text2); }
-  .btn-save { background: var(--accent); color: #fff; }
-  .btn-cancel:active, .btn-save:active { opacity: 0.8; }
-  /* EMPTY STATE */
-  .empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 14px; }
-  .empty strong { display: block; font-size: 16px; color: var(--text2); margin-bottom: 6px; }
-  /* PHASE BANNER */
-  .phase-banner { background: var(--accent-bg); border-radius: var(--radius-lg); padding: 12px 14px; margin-bottom: 20px; border: 1px solid rgba(59,124,244,0.15); }
-  .phase-label { font-size: 11px; font-weight: 600; color: var(--accent-text); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
-  .phase-desc { font-size: 13px; color: var(--text2); line-height: 1.4; }
-  /* FAB */
-  .fab { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; width: 52px; height: 52px; border-radius: 50%; background: var(--accent); color: #fff; border: none; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(59,124,244,0.4); z-index: 40; }
-  .fab:active { transform: scale(0.93); }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: calc(var(--safe-top) + 10px) 16px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-left { display: flex; align-items: center; gap: 10px; }
+.nav-title { font-size: 18px; font-weight: 700; letter-spacing: -0.4px; }
+.streak-pill {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--streak-bg); color: var(--streak);
+  border-radius: 20px; padding: 3px 9px; font-size: 13px; font-weight: 600;
+}
+.nav-week { display: flex; align-items: center; gap: 6px; }
+.nav-btn {
+  background: var(--surface2); border: none; border-radius: 8px;
+  width: 30px; height: 30px; cursor: pointer; font-size: 15px;
+  color: var(--text); display: flex; align-items: center; justify-content: center;
+}
+.nav-btn:active { opacity: 0.5; }
+.week-label { font-size: 12px; color: var(--text2); min-width: 90px; text-align: center; }
+
+/* ── TABS ── */
+.tabs {
+  display: flex; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 56px; z-index: 99;
+}
+.tab {
+  flex: 1; padding: 10px 0; font-size: 13px; font-weight: 500;
+  color: var(--text3); border: none; background: none; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
+}
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── VIEWS ── */
+.view { display: none; padding: 16px 16px calc(90px + var(--safe-bottom)); }
+.view.active { display: block; }
+
+/* ── RING ── */
+.ring-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; background: var(--surface); border-radius: var(--radius-lg); padding: 16px; border: 1px solid var(--border); }
+.ring-svg { flex-shrink: 0; }
+.ring-info { flex: 1; }
+.ring-pct { font-size: 32px; font-weight: 800; letter-spacing: -1px; color: var(--text); }
+.ring-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.ring-msg { font-size: 13px; font-weight: 500; margin-top: 8px; padding: 6px 10px; border-radius: 8px; }
+
+/* ── NOW CARD ── */
+.now-card {
+  background: var(--accent); color: #fff;
+  border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.now-icon { font-size: 28px; flex-shrink: 0; }
+.now-info { flex: 1; }
+.now-label { font-size: 11px; font-weight: 600; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.06em; }
+.now-name { font-size: 17px; font-weight: 700; margin-top: 1px; }
+.now-time { font-size: 12px; opacity: 0.8; margin-top: 1px; }
+.now-check { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.25); border: none; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.now-check:active { transform: scale(0.9); }
+
+/* ── SECTION ── */
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; margin-top: 4px; }
+.section-title { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; }
+.add-btn { background: var(--accent-bg); color: var(--accent-text); border: none; border-radius: 8px; padding: 5px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.add-btn:active { opacity: 0.7; }
+
+/* ── BLOCKS ── */
+.blocks-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 24px; }
+.block-item {
+  background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+  padding: 12px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s;
+  position: relative; overflow: hidden;
+}
+.block-item:active { transform: scale(0.98); }
+.block-item.done { opacity: 0.4; }
+.block-item.completing { animation: popIn 0.3s ease; }
+@keyframes popIn {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+.block-emoji { font-size: 20px; flex-shrink: 0; width: 32px; text-align: center; }
+.block-info { flex: 1; min-width: 0; }
+.block-name { font-size: 15px; font-weight: 500; color: var(--text); }
+.block-item.done .block-name { text-decoration: line-through; color: var(--text3); }
+.block-time { font-size: 12px; color: var(--text3); margin-top: 1px; }
+.block-check {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 1.5px solid var(--border2); display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0; transition: background 0.2s, border-color 0.2s;
+  font-size: 13px; color: transparent;
+}
+.block-item.done .block-check { background: var(--success); border-color: var(--success); color: #fff; }
+
+/* ── DAY SELECTOR ── */
+.day-selector { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
+.day-selector::-webkit-scrollbar { display: none; }
+.day-pill {
+  flex-shrink: 0; padding: 7px 10px; border-radius: 14px;
+  border: 1px solid var(--border2); background: var(--surface);
+  font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer;
+  transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  min-width: 44px;
+}
+.day-pill .d-name { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; }
+.day-pill .d-num { font-size: 16px; font-weight: 700; }
+.day-pill .d-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-top: 2px; }
+.day-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.day-pill.active .d-name { color: rgba(255,255,255,0.7); }
+.day-pill.active .d-dot { background: rgba(255,255,255,0.8); }
+.day-pill.has-perfect .d-dot { background: var(--success); }
+.day-pill.active.has-perfect .d-dot { background: #fff; }
+
+/* ── STATS GRID ── */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.stat-card { background: var(--surface); border-radius: var(--radius-lg); padding: 14px 16px; border: 1px solid var(--border); }
+.stat-val { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+.stat-lbl { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.progress-bar { height: 3px; background: var(--surface2); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.5s ease; }
+.progress-fill.green { background: var(--success); }
+
+/* ── CONTRIBUTION GRAPH ── */
+.contrib-wrap { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 14px 16px; margin-bottom: 20px; }
+.contrib-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+.contrib-grid { display: flex; gap: 3px; flex-wrap: wrap; }
+.contrib-day {
+  width: 28px; height: 28px; border-radius: 6px; background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 600; color: var(--text3); cursor: default;
+  position: relative;
+}
+.contrib-day.p0 { background: var(--surface2); }
+.contrib-day.p25 { background: #bbf7d0; color: #166534; }
+.contrib-day.p50 { background: #86efac; color: #166534; }
+.contrib-day.p75 { background: #4ade80; color: #166534; }
+.contrib-day.p100 { background: var(--success); color: #fff; }
+@media (prefers-color-scheme: dark) {
+  .contrib-day.p25 { background: #14532d; color: #86efac; }
+  .contrib-day.p50 { background: #166534; color: #bbf7d0; }
+  .contrib-day.p75 { background: #15803d; color: #dcfce7; }
+  .contrib-day.p100 { background: var(--success); color: #fff; }
+}
+
+/* ── WEEK ROWS ── */
+.week-row {
+  background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+  padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: transform 0.1s;
+}
+.week-row:active { transform: scale(0.98); }
+
+/* ── HABITS ── */
+.habit-table { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
+.habit-head { display: flex; align-items: center; padding: 8px 14px; background: var(--surface2); gap: 10px; }
+.habit-head-name { flex: 1; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+.habit-day-labels { display: flex; gap: 4px; }
+.h-day-lbl { width: 30px; text-align: center; font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; }
+.habit-row { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border); gap: 10px; }
+.habit-row:last-child { border-bottom: none; }
+.habit-name { font-size: 14px; font-weight: 500; flex: 1; color: var(--text); }
+.habit-days { display: flex; gap: 4px; }
+.h-dot {
+  width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border2);
+  background: var(--surface2); cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; font-weight: 600; color: transparent;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.h-dot:active { transform: scale(0.88); }
+.h-dot.done { background: var(--success); border-color: var(--success); color: #fff; }
+.habit-streak { font-size: 12px; color: var(--streak); font-weight: 600; min-width: 32px; text-align: right; }
+
+/* ── CONFETTI ── */
+.confetti-piece {
+  position: fixed; width: 8px; height: 8px; border-radius: 2px;
+  pointer-events: none; z-index: 9999;
+  animation: confettiFall 1s ease-in forwards;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(300px) rotate(720deg); opacity: 0; }
+}
+
+/* ── MODAL ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: 22px 22px 0 0; width: 100%; max-width: 540px; padding: 20px 20px calc(20px + var(--safe-bottom)); }
+.modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 16px; }
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
+.field input, .field select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 11px 12px; font-size: 15px; color: var(--text); font-family: var(--font); }
+.field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+.emoji-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.emoji-opt { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--border2); background: var(--surface2); cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
+.emoji-opt.sel { border-color: var(--accent); background: var(--accent-bg); }
+.color-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.color-swatch { width: 32px; height: 32px; border-radius: 8px; cursor: pointer; border: 3px solid transparent; transition: border-color 0.15s, transform 0.1s; }
+.color-swatch.sel { border-color: var(--text); transform: scale(1.1); }
+.modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+.modal-actions button { flex: 1; padding: 14px; border-radius: var(--radius); border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+.btn-cancel { background: var(--surface2); color: var(--text2); }
+.btn-save { background: var(--accent); color: #fff; }
+.btn-cancel:active, .btn-save:active { opacity: 0.75; }
+
+/* ── FAB ── */
+.fab {
+  position: fixed; bottom: calc(22px + var(--safe-bottom)); right: 18px;
+  width: 54px; height: 54px; border-radius: 50%; background: var(--accent);
+  color: #fff; border: none; font-size: 28px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(59,124,244,0.45); z-index: 50;
+  transition: transform 0.15s;
+}
+.fab:active { transform: scale(0.9); }
+
+/* ── PERFECT DAY BANNER ── */
+.perfect-banner {
+  background: linear-gradient(135deg, #16a362, #0d7a4a);
+  border-radius: var(--radius-lg); padding: 16px; margin-bottom: 20px;
+  text-align: center; color: #fff;
+  animation: popIn 0.4s ease;
+}
+.perfect-banner .pb-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+.perfect-banner .pb-sub { font-size: 14px; opacity: 0.85; }
+
+/* ── EMPTY ── */
+.empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 14px; }
+.empty strong { display: block; font-size: 16px; color: var(--text2); margin-bottom: 6px; }
+
+/* ── SCORE BADGE ── */
+.score-badge { font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+.score-0  { background: var(--surface2); color: var(--text3); }
+.score-low { background: var(--warning-bg); color: var(--warning); }
+.score-mid { background: var(--accent-bg); color: var(--accent-text); }
+.score-high { background: var(--success-bg); color: var(--success-text); }
 </style>
 </head>
 <body>
 
 <div class="nav">
-  <div class="nav-title">My Routine</div>
+  <div class="nav-left">
+    <div class="nav-title">My Routine</div>
+    <div class="streak-pill" id="streak-pill">🔥 0</div>
+  </div>
   <div class="nav-week">
     <button class="nav-btn" onclick="shiftWeek(-1)">‹</button>
     <div class="week-label" id="week-label"></div>
@@ -172,14 +331,17 @@
   <button class="tab active" onclick="switchTab('day')">Today</button>
   <button class="tab" onclick="switchTab('week')">Week</button>
   <button class="tab" onclick="switchTab('habits')">Habits</button>
+  <button class="tab" onclick="switchTab('progress')">Progress</button>
 </div>
 
 <!-- DAY VIEW -->
 <div class="view active" id="view-day">
+  <div id="ring-area"></div>
+  <div id="now-card-area"></div>
   <div id="day-selector-wrap"></div>
   <div class="section-head">
-    <div class="section-title" id="day-heading">Today's blocks</div>
-    <button class="add-btn" id="add-block-btn">+ Add block</button>
+    <div class="section-title" id="day-heading">Today</div>
+    <button class="add-btn" onclick="openAddBlock()">+ Add</button>
   </div>
   <div class="blocks-list" id="blocks-list"></div>
 </div>
@@ -187,11 +349,6 @@
 <!-- WEEK VIEW -->
 <div class="view" id="view-week">
   <div class="stats-grid" id="stats-grid"></div>
-  <div class="phase-banner">
-    <div class="phase-label">Phase 1 — Start here</div>
-    <div class="phase-desc">Add workout right after work and eat dinner by 7 PM this week. Don't worry about the mornings yet.</div>
-  </div>
-  <div class="section-title" style="margin-bottom:12px;">This week at a glance</div>
   <div id="week-overview"></div>
 </div>
 
@@ -204,6 +361,12 @@
   <div id="habits-table"></div>
 </div>
 
+<!-- PROGRESS VIEW -->
+<div class="view" id="view-progress">
+  <div id="contrib-area"></div>
+  <div id="insights-area"></div>
+</div>
+
 <!-- ADD BLOCK MODAL -->
 <div class="modal-overlay" id="modal-block">
   <div class="modal">
@@ -211,6 +374,7 @@
     <div class="modal-title">Add time block</div>
     <div class="field"><label>Name</label><input id="b-name" placeholder="e.g. Morning workout" /></div>
     <div class="field"><label>Time</label><input id="b-time" placeholder="e.g. 7:00 AM" /></div>
+    <div class="field"><label>Icon</label><div class="emoji-grid" id="emoji-grid"></div></div>
     <div class="field"><label>Color</label><div class="color-grid" id="color-grid"></div></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModals()">Cancel</button>
@@ -232,125 +396,192 @@
   </div>
 </div>
 
+<button class="fab" onclick="openAddBlock()">+</button>
+
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────
+// ── CONSTANTS ──────────────────────────────────────────────────
 const COLORS = [
-  { id: 'amber',  bg: '#FAEEDA', dot: '#EF9F27' },
-  { id: 'blue',   bg: '#E6F1FB', dot: '#378ADD' },
-  { id: 'teal',   bg: '#E1F5EE', dot: '#1D9E75' },
-  { id: 'purple', bg: '#EEEDFE', dot: '#7F77DD' },
-  { id: 'coral',  bg: '#FAECE7', dot: '#D85A30' },
-  { id: 'green',  bg: '#EAF3DE', dot: '#639922' },
-  { id: 'pink',   bg: '#FBEAF0', dot: '#D4537E' },
-  { id: 'gray',   bg: '#F1EFE8', dot: '#888780' },
+  { id:'amber',  light:'#FAEEDA', dot:'#EF9F27' },
+  { id:'blue',   light:'#E6F1FB', dot:'#378ADD' },
+  { id:'teal',   light:'#E1F5EE', dot:'#1D9E75' },
+  { id:'purple', light:'#EEEDFE', dot:'#7F77DD' },
+  { id:'coral',  light:'#FAECE7', dot:'#D85A30' },
+  { id:'green',  light:'#EAF3DE', dot:'#639922' },
+  { id:'pink',   light:'#FBEAF0', dot:'#D4537E' },
+  { id:'gray',   light:'#F1EFE8', dot:'#888780' },
 ];
-
-const ROUTINE = [
-  { name: 'Wake up — no phone',     time: '6:45 AM',            color: 'amber',  days: [0,1,2,3,4,5,6] },
-  { name: 'Breakfast',              time: '7:00 AM',            color: 'amber',  days: [0,1,2,3,4,5,6] },
-  { name: 'Work',                   time: '9:00 AM – 5:30 PM',  color: 'blue',   days: [1,2,3,4,5] },
-  { name: 'Shutdown ritual',        time: '5:15 PM',            color: 'blue',   days: [1,2,3,4,5] },
-  { name: 'Workout',                time: '5:45 PM',            color: 'teal',   days: [1,2,3,4,5] },
-  { name: 'Dinner',                 time: '7:00 PM',            color: 'teal',   days: [0,1,2,3,4,5,6] },
-  { name: 'Free time',              time: '8:00 PM',            color: 'purple', days: [0,1,2,3,4,5,6] },
-  { name: 'Wind-down — no screens', time: '9:30 PM',            color: 'purple', days: [0,1,2,3,4,5,6] },
-  { name: 'Sleep',                  time: '10:00 PM',           color: 'gray',   days: [0,1,2,3,4,5,6] },
-];
-
-const DEFAULT_HABITS = [
-  'Eat breakfast',
-  'Workout done',
-  'No screens after 9:30 PM',
-  'In bed by 10 PM',
-  'Shutdown ritual',
-];
-
+const EMOJIS = ['☀️','💪','🍳','💼','🧘','🚶','📖','🎯','💤','🥗','🏃','🎨','✍️','🎵','🌙','💧'];
 const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-// ── STATE ─────────────────────────────────────────────────────────────
-let state = load();
+const ROUTINE = [
+  { name:'Wake up — no phone', time:'6:45 AM',           color:'amber',  emoji:'☀️', days:[0,1,2,3,4,5,6] },
+  { name:'Breakfast',          time:'7:00 AM',           color:'amber',  emoji:'🍳', days:[0,1,2,3,4,5,6] },
+  { name:'Work',               time:'9:00 AM – 5:30 PM', color:'blue',   emoji:'💼', days:[1,2,3,4,5] },
+  { name:'Shutdown ritual',    time:'5:15 PM',           color:'blue',   emoji:'✍️', days:[1,2,3,4,5] },
+  { name:'Workout',            time:'5:45 PM',           color:'teal',   emoji:'💪', days:[1,2,3,4,5] },
+  { name:'Dinner',             time:'7:00 PM',           color:'teal',   emoji:'🥗', days:[0,1,2,3,4,5,6] },
+  { name:'Free time',          time:'8:00 PM',           color:'purple', emoji:'🎵', days:[0,1,2,3,4,5,6] },
+  { name:'Wind-down',          time:'9:30 PM',           color:'purple', emoji:'🌙', days:[0,1,2,3,4,5,6] },
+  { name:'Sleep',              time:'10:00 PM',          color:'gray',   emoji:'💤', days:[0,1,2,3,4,5,6] },
+];
+
+const DEFAULT_HABITS = ['Eat breakfast','Workout done','No screens after 9:30 PM','In bed by 10 PM','Shutdown ritual'];
+
+const MESSAGES = {
+  0:  ["Today's a clean slate — let's go.", "Every routine starts with one check.", "Small steps, big change."],
+  25: ["Good start! Keep the momentum.", "One block at a time.", "You're moving — don't stop now."],
+  50: ["Halfway there, keep pushing.", "More done than not. That's a win.", "Past the halfway point — finish strong."],
+  75: ["Almost there, don't quit now!", "So close to a perfect day.", "Three quarters done — finish it."],
+  100:["Perfect day. You crushed it! 🎉", "Full routine complete. That's a streak.", "100%! You showed up for yourself today."]
+};
+
+// ── STATE ──────────────────────────────────────────────────────
+let state = loadState();
 let weekOffset = 0;
 let selectedDay = todayKey();
 let selectedColor = 'amber';
+let selectedEmoji = '☀️';
 let activeTab = 'day';
 
-function load() {
+function loadState() {
   try {
-    const raw = localStorage.getItem('routine_v1');
-    if (raw) return JSON.parse(raw);
+    const r = localStorage.getItem('routine_v2');
+    if (r) return JSON.parse(r);
   } catch(e) {}
   return buildDefault();
 }
 
-function save() {
-  try { localStorage.setItem('routine_v1', JSON.stringify(state)); } catch(e) {}
+function saveState() {
+  try { localStorage.setItem('routine_v2', JSON.stringify(state)); } catch(e) {}
 }
 
 function buildDefault() {
   const blocks = {};
-  const today = new Date();
-  // seed 4 weeks of blocks (2 past, current, 1 future)
-  for (let w = -2; w <= 1; w++) {
+  for (let w = -4; w <= 2; w++) {
     getWeekDates(w).forEach(d => {
       const dk = dateKey(d);
       blocks[dk] = ROUTINE
         .filter(r => r.days.includes(d.getDay()))
-        .map((r, i) => ({ id: `${dk}-${i}`, name: r.name, time: r.time, color: r.color, done: false }));
+        .map((r,i) => ({ id:`${dk}-${i}`, name:r.name, time:r.time, color:r.color, emoji:r.emoji, done:false }));
     });
   }
-  return {
-    blocks,
-    habits: DEFAULT_HABITS.map((name, i) => ({ id: `h${i}`, name })),
-    habitDone: {},
-  };
+  return { blocks, habits: DEFAULT_HABITS.map((n,i)=>({id:`h${i}`,name:n})), habitDone:{} };
 }
 
-// ── DATE UTILS ────────────────────────────────────────────────────────
-function todayKey() {
-  return dateKey(new Date());
-}
-
-function dateKey(d) {
-  return d.toISOString().slice(0, 10);
-}
-
+// ── DATE UTILS ─────────────────────────────────────────────────
+function todayKey() { return dateKey(new Date()); }
+function dateKey(d) { return d.toISOString().slice(0,10); }
 function getWeekDates(offset) {
   const now = new Date();
   const day = now.getDay();
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1) + offset * 7);
-  return Array.from({length: 7}, (_, i) => {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    return d;
-  });
+  const mon = new Date(now);
+  mon.setDate(now.getDate() - (day===0?6:day-1) + offset*7);
+  return Array.from({length:7},(_,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); return d; });
 }
-
-function isToday(d) { return dateKey(d) === todayKey(); }
-
-function fmtDate(d) {
-  return d.toLocaleString('default', { month: 'short', day: 'numeric' });
-}
-
-function ensureBlocks(dk, dayOfWeek) {
+function isToday(d) { return dateKey(d)===todayKey(); }
+function fmtDate(d) { return d.toLocaleString('default',{month:'short',day:'numeric'}); }
+function ensureBlocks(dk, dow) {
   if (!state.blocks[dk]) {
-    state.blocks[dk] = ROUTINE
-      .filter(r => r.days.includes(dayOfWeek))
-      .map((r, i) => ({ id: `${dk}-${i}`, name: r.name, time: r.time, color: r.color, done: false }));
-    save();
+    state.blocks[dk] = ROUTINE.filter(r=>r.days.includes(dow))
+      .map((r,i)=>({id:`${dk}-${i}`,name:r.name,time:r.time,color:r.color,emoji:r.emoji,done:false}));
+    saveState();
   }
 }
 
-// ── UI HELPERS ────────────────────────────────────────────────────────
-function colorById(id) { return COLORS.find(c => c.id === id) || COLORS[0]; }
+// ── STREAK ─────────────────────────────────────────────────────
+function calcStreak() {
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dk = dateKey(d);
+    const bl = state.blocks[dk] || [];
+    if (!bl.length) { if (i===0) continue; break; }
+    const pct = bl.filter(b=>b.done).length / bl.length * 100;
+    if (pct >= 80) streak++;
+    else if (i > 0) break;
+  }
+  return streak;
+}
 
+// ── CONFETTI ───────────────────────────────────────────────────
+function burst(x, y) {
+  const colors = ['#3b7cf4','#16a362','#f97316','#d4537e','#7f77dd','#ef9f27'];
+  for (let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left:${x + (Math.random()-0.5)*80}px;
+      top:${y}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      transform:rotate(${Math.random()*360}deg);
+      animation-duration:${0.7+Math.random()*0.6}s;
+      animation-delay:${Math.random()*0.2}s;
+    `;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 1400);
+  }
+}
+
+// ── COMPLETION RING SVG ─────────────────────────────────────────
+function ringHTML(pct, done, total) {
+  const r = 36, c = 2*Math.PI*r;
+  const offset = c - (pct/100)*c;
+  const msgBucket = pct===100?100:pct>=75?75:pct>=50?50:pct>=25?25:0;
+  const msgs = MESSAGES[msgBucket];
+  const msg = msgs[Math.floor(Date.now()/86400000) % msgs.length];
+  const msgClass = pct===100?'ring-msg" style="background:var(--success-bg);color:var(--success-text)'
+    :pct>=50?'ring-msg" style="background:var(--accent-bg);color:var(--accent-text)'
+    :'ring-msg" style="background:var(--surface2);color:var(--text2)';
+  const color = pct===100?'var(--success)':pct>=75?'var(--accent)':'var(--accent)';
+  return `<div class="ring-wrap">
+    <svg class="ring-svg" width="88" height="88" viewBox="0 0 88 88">
+      <circle cx="44" cy="44" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="8"/>
+      <circle cx="44" cy="44" r="${r}" fill="none" stroke="${color}" stroke-width="8"
+        stroke-dasharray="${c}" stroke-dashoffset="${offset}"
+        stroke-linecap="round" transform="rotate(-90 44 44)"
+        style="transition:stroke-dashoffset 0.6s ease"/>
+      <text x="44" y="48" text-anchor="middle" font-size="16" font-weight="800" fill="var(--text)">${pct}%</text>
+    </svg>
+    <div class="ring-info">
+      <div class="ring-pct">${done}/${total}</div>
+      <div class="ring-sub">blocks completed today</div>
+      <div class="${msgClass}">${msg}</div>
+    </div>
+  </div>`;
+}
+
+// ── NOW CARD ───────────────────────────────────────────────────
+function getNowBlock(blocks) {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const mins = h*60+m;
+  function parseTime(t) {
+    if (!t) return null;
+    const match = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!match) return null;
+    let hr = parseInt(match[1]), mn = parseInt(match[2]);
+    const pm = match[3].toUpperCase()==='PM';
+    if (pm && hr!==12) hr+=12;
+    if (!pm && hr===12) hr=0;
+    return hr*60+mn;
+  }
+  const undone = blocks.filter(b=>!b.done);
+  for (const b of undone) {
+    const t = parseTime(b.time);
+    if (t !== null && Math.abs(t - mins) < 120) return b;
+  }
+  return undone[0] || null;
+}
+
+// ── UI ─────────────────────────────────────────────────────────
 function switchTab(tab) {
   activeTab = tab;
-  document.querySelectorAll('.tab').forEach((t, i) => {
-    const tabs = ['day','week','habits'];
-    t.classList.toggle('active', tabs[i] === tab);
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active',['day','week','habits','progress'][i]===tab);
   });
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById(`view-${tab}`).classList.add('active');
   render();
 }
@@ -358,231 +589,316 @@ function switchTab(tab) {
 function shiftWeek(dir) {
   weekOffset += dir;
   const dates = getWeekDates(weekOffset);
-  // keep selectedDay in range
-  const dk0 = dateKey(dates[0]), dk6 = dateKey(dates[6]);
-  if (selectedDay < dk0) selectedDay = dk0;
-  if (selectedDay > dk6) selectedDay = dk6;
+  const dk0=dateKey(dates[0]), dk6=dateKey(dates[6]);
+  if (selectedDay<dk0) selectedDay=dk0;
+  if (selectedDay>dk6) selectedDay=dk6;
   render();
 }
 
-function closeModals() {
-  document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
-}
+function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')); }
 
 function openAddBlock() {
-  document.getElementById('b-name').value = '';
-  document.getElementById('b-time').value = '';
-  renderColorGrid();
+  document.getElementById('b-name').value='';
+  document.getElementById('b-time').value='';
+  renderEmojiGrid(); renderColorGrid();
   document.getElementById('modal-block').classList.add('open');
-  setTimeout(() => document.getElementById('b-name').focus(), 50);
+  setTimeout(()=>document.getElementById('b-name').focus(),80);
 }
-
 function openAddHabit() {
-  document.getElementById('h-name').value = '';
+  document.getElementById('h-name').value='';
   document.getElementById('modal-habit').classList.add('open');
-  setTimeout(() => document.getElementById('h-name').focus(), 50);
+  setTimeout(()=>document.getElementById('h-name').focus(),80);
 }
 
-function renderColorGrid() {
-  document.getElementById('color-grid').innerHTML = COLORS.map(c =>
-    `<div class="color-swatch ${c.id === selectedColor ? 'sel' : ''}" style="background:${c.bg};border-color:${c.id===selectedColor?c.dot:'transparent'}"
-      onclick="pickColor('${c.id}')"></div>`
+function renderEmojiGrid() {
+  document.getElementById('emoji-grid').innerHTML = EMOJIS.map(e=>
+    `<div class="emoji-opt ${e===selectedEmoji?'sel':''}" onclick="pickEmoji('${e}')">${e}</div>`
   ).join('');
 }
-
-function pickColor(id) {
-  selectedColor = id;
-  renderColorGrid();
+function renderColorGrid() {
+  document.getElementById('color-grid').innerHTML = COLORS.map(c=>
+    `<div class="color-swatch ${c.id===selectedColor?'sel':''}" style="background:${c.light};border-color:${c.id===selectedColor?c.dot:'transparent'}" onclick="pickColor('${c.id}')"></div>`
+  ).join('');
 }
+function pickEmoji(e) { selectedEmoji=e; renderEmojiGrid(); }
+function pickColor(id) { selectedColor=id; renderColorGrid(); }
 
 function saveBlock() {
-  const name = document.getElementById('b-name').value.trim();
+  const name=document.getElementById('b-name').value.trim();
   if (!name) return;
-  const time = document.getElementById('b-time').value.trim();
-  const dk = selectedDay;
-  if (!state.blocks[dk]) state.blocks[dk] = [];
-  state.blocks[dk].push({ id: `custom-${Date.now()}`, name, time, color: selectedColor, done: false });
-  save();
-  closeModals();
-  render();
+  const time=document.getElementById('b-time').value.trim();
+  if (!state.blocks[selectedDay]) state.blocks[selectedDay]=[];
+  state.blocks[selectedDay].push({id:`c${Date.now()}`,name,time,color:selectedColor,emoji:selectedEmoji,done:false});
+  saveState(); closeModals(); render();
 }
-
 function saveHabit() {
-  const name = document.getElementById('h-name').value.trim();
+  const name=document.getElementById('h-name').value.trim();
   if (!name) return;
-  state.habits.push({ id: `h${Date.now()}`, name });
-  save();
-  closeModals();
+  state.habits.push({id:`h${Date.now()}`,name});
+  saveState(); closeModals(); render();
+}
+
+function toggleBlock(dk, id, el) {
+  const b=(state.blocks[dk]||[]).find(x=>x.id===id);
+  if (!b) return;
+  b.done=!b.done;
+  saveState();
+  if (b.done) {
+    el.classList.add('completing');
+    const rect=el.getBoundingClientRect();
+    burst(rect.left+rect.width/2, rect.top+rect.height/2);
+    setTimeout(()=>el.classList.remove('completing'),400);
+    // check perfect day
+    const bl=state.blocks[dk]||[];
+    if (bl.every(x=>x.done)) setTimeout(()=>render(),350);
+    else render();
+  } else { render(); }
+}
+
+function toggleHabit(hid, dk, el) {
+  const k=`${hid}__${dk}`;
+  state.habitDone[k]=!state.habitDone[k];
+  saveState();
+  if (state.habitDone[k]) {
+    el.classList.add('completing');
+    const rect=el.getBoundingClientRect();
+    burst(rect.left+rect.width/2, rect.top+rect.height/2);
+  }
   render();
 }
 
-function toggleBlock(dk, id) {
-  const b = (state.blocks[dk] || []).find(x => x.id === id);
-  if (b) { b.done = !b.done; save(); render(); }
+function selectDay(dk) { selectedDay=dk; render(); }
+
+function habitStreak(hid) {
+  let streak=0;
+  const today=new Date();
+  for (let i=0;i<60;i++) {
+    const d=new Date(today); d.setDate(today.getDate()-i);
+    const k=`${hid}__${dateKey(d)}`;
+    if (state.habitDone[k]) streak++;
+    else if (i>0) break;
+  }
+  return streak;
 }
 
-function toggleHabit(hid, dk) {
-  const k = `${hid}__${dk}`;
-  state.habitDone[k] = !state.habitDone[k];
-  save();
-  render();
-}
-
-function selectDay(dk) {
-  selectedDay = dk;
-  render();
-}
-
-// ── RENDER ────────────────────────────────────────────────────────────
+// ── RENDER ─────────────────────────────────────────────────────
 function render() {
   const dates = getWeekDates(weekOffset);
-  const fmt0 = fmtDate(dates[0]), fmt6 = fmtDate(dates[6]);
-  document.getElementById('week-label').textContent = `${fmt0} – ${fmt6}`;
+  document.getElementById('week-label').textContent=`${fmtDate(dates[0])} – ${fmtDate(dates[6])}`;
+  document.getElementById('streak-pill').textContent=`🔥 ${calcStreak()}`;
 
-  if (activeTab === 'day') renderDayView(dates);
-  if (activeTab === 'week') renderWeekView(dates);
-  if (activeTab === 'habits') renderHabitsView(dates);
+  if (activeTab==='day') renderDay(dates);
+  if (activeTab==='week') renderWeek(dates);
+  if (activeTab==='habits') renderHabits(dates);
+  if (activeTab==='progress') renderProgress();
 }
 
-function renderDayView(dates) {
+function renderDay(dates) {
   // day selector
-  document.getElementById('day-selector-wrap').innerHTML = `
-    <div class="day-selector">
-      ${dates.map(d => {
-        const dk = dateKey(d);
-        const isActive = dk === selectedDay;
-        const isTod = isToday(d);
-        return `<div class="day-pill ${isActive?'active':''} ${isTod&&!isActive?'today-dot':''}" onclick="selectDay('${dk}')">
-          <span class="d-name">${DAYS_SHORT[d.getDay()]}</span>
-          <span class="d-num">${d.getDate()}</span>
-          ${isTod&&isActive?'<span style="font-size:8px;opacity:0.7">today</span>':''}
-        </div>`;
-      }).join('')}
-    </div>`;
+  document.getElementById('day-selector-wrap').innerHTML=`<div class="day-selector">${
+    dates.map(d=>{
+      const dk=dateKey(d);
+      const bl=state.blocks[dk]||[];
+      const perfect=bl.length>0&&bl.every(b=>b.done);
+      return `<div class="day-pill ${dk===selectedDay?'active':''} ${perfect?'has-perfect':''}" onclick="selectDay('${dk}')">
+        <span class="d-name">${DAYS_SHORT[d.getDay()]}</span>
+        <span class="d-num">${d.getDate()}</span>
+        <span class="d-dot"></span>
+      </div>`;
+    }).join('')
+  }</div>`;
 
-  const selDate = dates.find(d => dateKey(d) === selectedDay) || dates[0];
+  const selDate=dates.find(d=>dateKey(d)===selectedDay)||dates[0];
   ensureBlocks(selectedDay, selDate.getDay());
+  const blocks=state.blocks[selectedDay]||[];
+  const done=blocks.filter(b=>b.done).length;
+  const pct=blocks.length?Math.round(done/blocks.length*100):0;
 
-  const blocks = state.blocks[selectedDay] || [];
-  const done = blocks.filter(b => b.done).length;
+  // ring
+  document.getElementById('ring-area').innerHTML=ringHTML(pct,done,blocks.length);
 
-  document.getElementById('day-heading').textContent =
-    isToday(selDate) ? `Today — ${done}/${blocks.length} done` :
-    `${DAYS_SHORT[selDate.getDay()]} ${selDate.getMonth()+1}/${selDate.getDate()} — ${done}/${blocks.length} done`;
+  // perfect day banner
+  let perfectHTML='';
+  if (pct===100&&blocks.length>0) {
+    perfectHTML=`<div class="perfect-banner"><div class="pb-title">🎉 Perfect Day!</div><div class="pb-sub">Full routine complete. You showed up for yourself.</div></div>`;
+  }
 
-  document.getElementById('add-block-btn').onclick = openAddBlock;
-
-  document.getElementById('blocks-list').innerHTML = blocks.length ? blocks.map(b => {
-    const c = colorById(b.color);
-    return `<div class="block-item ${b.done?'done':''}" onclick="toggleBlock('${selectedDay}','${b.id}')">
-      <div class="block-dot" style="background:${c.dot}"></div>
-      <div class="block-info">
-        <div class="block-name">${b.name}</div>
-        ${b.time ? `<div class="block-time">${b.time}</div>` : ''}
+  // now card
+  const now=getNowBlock(blocks);
+  let nowHTML='';
+  if (now && isToday(selDate) && pct<100) {
+    const c=COLORS.find(x=>x.id===now.color)||COLORS[0];
+    nowHTML=`<div class="now-card" style="background:${c.dot}">
+      <div class="now-icon">${now.emoji||'🎯'}</div>
+      <div class="now-info">
+        <div class="now-label">Up next</div>
+        <div class="now-name">${now.name}</div>
+        ${now.time?`<div class="now-time">${now.time}</div>`:''}
       </div>
-      <div class="block-check"><span class="check-icon">✓</span></div>
+      <button class="now-check" onclick="toggleBlock('${selectedDay}','${now.id}',this.closest('.now-card'))">✓</button>
     </div>`;
-  }).join('') : `<div class="empty"><strong>No blocks yet</strong>Tap + Add block to get started.</div>`;
+  }
+  document.getElementById('now-card-area').innerHTML=perfectHTML+nowHTML;
+
+  document.getElementById('day-heading').textContent=
+    isToday(selDate)?`Today — ${done}/${blocks.length}`
+    :`${DAYS_SHORT[selDate.getDay()]} ${selDate.getMonth()+1}/${selDate.getDate()} — ${done}/${blocks.length}`;
+
+  document.getElementById('blocks-list').innerHTML=blocks.length
+    ? blocks.map(b=>{
+        const c=COLORS.find(x=>x.id===b.color)||COLORS[0];
+        return `<div class="block-item ${b.done?'done':''}" id="bi-${b.id}" onclick="toggleBlock('${selectedDay}','${b.id}',this)">
+          <div class="block-emoji">${b.emoji||'🎯'}</div>
+          <div class="block-info">
+            <div class="block-name">${b.name}</div>
+            ${b.time?`<div class="block-time">${b.time}</div>`:''}
+          </div>
+          <div class="block-check" style="border-color:${b.done?'':c.dot}">${b.done?'✓':''}</div>
+        </div>`;
+      }).join('')
+    : `<div class="empty"><strong>No blocks</strong>Tap + to add your first block.</div>`;
 }
 
-function renderWeekView(dates) {
-  let total=0, done=0, hTotal=0, hDone=0;
-  dates.forEach(d => {
-    const bl = state.blocks[dateKey(d)] || [];
-    total += bl.length; done += bl.filter(b=>b.done).length;
-  });
-  state.habits.forEach(h => {
-    dates.forEach(d => {
-      hTotal++;
-      if (state.habitDone[`${h.id}__${dateKey(d)}`]) hDone++;
-    });
-  });
-  const pct = total ? Math.round(done/total*100) : 0;
-  const hPct = hTotal ? Math.round(hDone/hTotal*100) : 0;
+function renderWeek(dates) {
+  let total=0,done=0,hTotal=0,hDone=0;
+  dates.forEach(d=>{ const bl=state.blocks[dateKey(d)]||[]; total+=bl.length; done+=bl.filter(b=>b.done).length; });
+  state.habits.forEach(h=>dates.forEach(d=>{ hTotal++; if(state.habitDone[`${h.id}__${dateKey(d)}`]) hDone++; }));
+  const pct=total?Math.round(done/total*100):0;
+  const hPct=hTotal?Math.round(hDone/hTotal*100):0;
 
-  document.getElementById('stats-grid').innerHTML = `
+  document.getElementById('stats-grid').innerHTML=`
     <div class="stat-card">
       <div class="stat-val">${done}/${total}</div>
-      <div class="stat-lbl">Blocks completed</div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="stat-lbl">Blocks done</div>
+      <div class="progress-bar"><div class="progress-fill ${pct>=80?'green':''}" style="width:${pct}%"></div></div>
     </div>
     <div class="stat-card">
       <div class="stat-val">${pct}%</div>
-      <div class="stat-lbl">Completion rate</div>
+      <div class="stat-lbl">Completion</div>
     </div>
     <div class="stat-card">
       <div class="stat-val">${hDone}/${hTotal}</div>
-      <div class="stat-lbl">Habits checked</div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${hPct}%"></div></div>
+      <div class="stat-lbl">Habits done</div>
+      <div class="progress-bar"><div class="progress-fill ${hPct>=80?'green':''}" style="width:${hPct}%"></div></div>
     </div>
     <div class="stat-card">
-      <div class="stat-val">${hPct}%</div>
-      <div class="stat-lbl">Habit rate</div>
+      <div class="stat-val">🔥${calcStreak()}</div>
+      <div class="stat-lbl">Day streak</div>
     </div>`;
 
-  document.getElementById('week-overview').innerHTML = dates.map(d => {
-    const dk = dateKey(d);
-    const bl = state.blocks[dk] || [];
-    const doneCount = bl.filter(b=>b.done).length;
-    const pctD = bl.length ? Math.round(doneCount/bl.length*100) : 0;
-    return `<div style="background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;" onclick="selectDay('${dk}');switchTab('day')">
-      <div style="min-width:40px;">
-        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;">${DAYS_SHORT[d.getDay()]}</div>
-        <div style="font-size:18px;font-weight:700;color:${isToday(d)?'var(--accent)':'var(--text)'};">${d.getDate()}</div>
+  document.getElementById('week-overview').innerHTML=dates.map(d=>{
+    const dk=dateKey(d);
+    const bl=state.blocks[dk]||[];
+    const dc=bl.filter(b=>b.done).length;
+    const dp=bl.length?Math.round(dc/bl.length*100):0;
+    const cls=dp>=80?'score-high':dp>=50?'score-mid':dp>0?'score-low':'score-0';
+    return `<div class="week-row" onclick="selectDay('${dk}');switchTab('day')">
+      <div style="min-width:42px">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase">${DAYS_SHORT[d.getDay()]}</div>
+        <div style="font-size:20px;font-weight:800;color:${isToday(d)?'var(--accent)':'var(--text)'}">${d.getDate()}</div>
       </div>
-      <div style="flex:1;">
-        <div style="font-size:13px;color:var(--text2);margin-bottom:5px;">${doneCount}/${bl.length} blocks</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:${pctD}%"></div></div>
+      <div style="flex:1">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:5px">${dc}/${bl.length} blocks</div>
+        <div class="progress-bar"><div class="progress-fill ${dp>=80?'green':''}" style="width:${dp}%"></div></div>
       </div>
-      <div style="font-size:13px;font-weight:600;color:${pctD>=70?'var(--success)':pctD>=40?'var(--accent)':'var(--text3)'};">${pctD}%</div>
+      <div class="score-badge ${cls}">${dp}%</div>
     </div>`;
   }).join('');
 }
 
-function renderHabitsView(dates) {
+function renderHabits(dates) {
   if (!state.habits.length) {
-    document.getElementById('habits-table').innerHTML = `<div class="empty"><strong>No habits yet</strong>Add your first daily habit above.</div>`;
+    document.getElementById('habits-table').innerHTML=`<div class="empty"><strong>No habits yet</strong>Add your first daily habit above.</div>`;
     return;
   }
-  document.getElementById('habits-table').innerHTML = `
+  document.getElementById('habits-table').innerHTML=`
     <div class="habit-table">
       <div class="habit-head">
         <div class="habit-head-name">Habit</div>
-        <div class="habit-day-labels">
-          ${dates.map(d => `<div class="h-day-lbl">${DAYS_SHORT[d.getDay()][0]}</div>`).join('')}
-        </div>
-        <div style="min-width:30px"></div>
+        <div class="habit-day-labels">${dates.map(d=>`<div class="h-day-lbl">${DAYS_SHORT[d.getDay()][0]}</div>`).join('')}</div>
+        <div style="min-width:36px;text-align:right;font-size:10px;font-weight:600;color:var(--streak)">streak</div>
       </div>
-      ${state.habits.map(h => {
-        const doneDays = dates.filter(d => state.habitDone[`${h.id}__${dateKey(d)}`]).length;
-        const pct = Math.round(doneDays/7*100);
+      ${state.habits.map(h=>{
+        const s=habitStreak(h.id);
         return `<div class="habit-row">
           <div class="habit-name">${h.name}</div>
-          <div class="habit-days">
-            ${dates.map(d => {
-              const dk = dateKey(d);
-              const done = state.habitDone[`${h.id}__${dk}`];
-              return `<div class="h-dot ${done?'done':''}" onclick="toggleHabit('${h.id}','${dk}')">${done?'✓':''}</div>`;
-            }).join('')}
-          </div>
-          <div class="habit-pct">${pct}%</div>
+          <div class="habit-days">${dates.map(d=>{
+            const dk=dateKey(d);
+            const done=state.habitDone[`${h.id}__${dk}`];
+            return `<div class="h-dot ${done?'done':''}" onclick="toggleHabit('${h.id}','${dk}',this)">${done?'✓':''}</div>`;
+          }).join('')}</div>
+          <div class="habit-streak">${s>0?`🔥${s}`:'-'}</div>
         </div>`;
       }).join('')}
     </div>`;
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────
-document.querySelectorAll('.modal-overlay').forEach(m =>
-  m.addEventListener('click', e => { if (e.target === m) closeModals(); })
+function renderProgress() {
+  // contribution graph — last 28 days
+  const days=[];
+  for (let i=27;i>=0;i--) { const d=new Date(); d.setDate(d.getDate()-i); days.push(d); }
+  const contribHTML=days.map(d=>{
+    const dk=dateKey(d);
+    const bl=state.blocks[dk]||[];
+    const pct=bl.length?Math.round(bl.filter(b=>b.done).length/bl.length*100):0;
+    const cls=pct>=100?'p100':pct>=75?'p75':pct>=50?'p50':pct>0?'p25':'p0';
+    return `<div class="contrib-day ${cls}" title="${dk}: ${pct}%">${d.getDate()}</div>`;
+  }).join('');
+
+  // insights
+  const allDays=days.map(d=>({ dk:dateKey(d), dow:d.getDay(), bl:state.blocks[dateKey(d)]||[] }));
+  const byDow=[0,1,2,3,4,5,6].map(dow=>{
+    const ds=allDays.filter(x=>x.dow===dow&&x.bl.length>0);
+    if (!ds.length) return {dow,pct:0,n:0};
+    const avg=ds.reduce((s,x)=>s+x.bl.filter(b=>b.done).length/x.bl.length,0)/ds.length*100;
+    return {dow,pct:Math.round(avg),n:ds.length};
+  });
+  const best=byDow.reduce((a,b)=>b.pct>a.pct?b:a,byDow[0]);
+  const worst=byDow.filter(d=>d.n>0).reduce((a,b)=>b.pct<a.pct?b:a,byDow.find(d=>d.n>0)||byDow[0]);
+
+  document.getElementById('contrib-area').innerHTML=`
+    <div class="contrib-wrap">
+      <div class="contrib-title">Last 28 days</div>
+      <div class="contrib-grid">${contribHTML}</div>
+      <div style="display:flex;gap:6px;align-items:center;margin-top:10px;font-size:11px;color:var(--text3)">
+        <div style="width:12px;height:12px;border-radius:3px;background:var(--surface2)"></div> 0%
+        <div style="width:12px;height:12px;border-radius:3px;background:#86efac;margin-left:6px"></div> 50%
+        <div style="width:12px;height:12px;border-radius:3px;background:var(--success);margin-left:6px"></div> 100%
+      </div>
+    </div>`;
+
+  document.getElementById('insights-area').innerHTML=`
+    <div class="section-title" style="margin-bottom:12px">Insights</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-val">🏆</div>
+        <div class="stat-lbl">Best day: ${DAYS_SHORT[best.dow]} (${best.pct}%)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">📈</div>
+        <div class="stat-lbl">Focus: ${worst.n>0?DAYS_SHORT[worst.dow]+' needs work':'-'}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">${calcStreak()}</div>
+        <div class="stat-lbl">Current streak 🔥</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">${days.filter(d=>{const bl=state.blocks[dateKey(d)]||[];return bl.length>0&&bl.every(b=>b.done);}).length}</div>
+        <div class="stat-lbl">Perfect days (28d)</div>
+      </div>
+    </div>`;
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+document.querySelectorAll('.modal-overlay').forEach(m=>
+  m.addEventListener('click',e=>{ if(e.target===m) closeModals(); })
 );
-
-// set selectedDay to today
-selectedDay = todayKey();
-// ensure today's blocks exist
-const todayDate = new Date();
-ensureBlocks(todayKey(), todayDate.getDay());
-
+selectedDay=todayKey();
+ensureBlocks(todayKey(), new Date().getDay());
 render();
+
+// refresh now-card every minute
+setInterval(()=>{ if(activeTab==='day') render(); }, 60000);
 </script>
 </body>
 </html>

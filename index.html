@@ -194,17 +194,30 @@ body {
 .block-item {
   background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
   padding: 12px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer;
-  transition: transform 0.1s, opacity 0.2s;
-  position: relative; overflow: hidden;
+  transition: transform 0.1s, opacity 0.2s, box-shadow 0.1s;
+  position: relative; overflow: visible;
 }
 .block-item:active { transform: scale(0.98); }
 .block-item.done { opacity: 0.4; }
 .block-item.completing { animation: popIn 0.3s ease; }
+.block-item.dragging {
+  opacity: 0.5; transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  z-index: 10; cursor: grabbing;
+}
+.block-item.drag-over { border-color: var(--accent); border-style: dashed; }
 @keyframes popIn {
   0% { transform: scale(1); }
   40% { transform: scale(1.03); }
   100% { transform: scale(1); }
 }
+.drag-handle {
+  color: var(--text3); font-size: 16px; cursor: grab; flex-shrink: 0;
+  padding: 2px 2px; touch-action: none; line-height: 1;
+  display: flex; flex-direction: column; gap: 2px; align-items: center;
+}
+.drag-handle:active { cursor: grabbing; }
+.drag-handle span { display: block; width: 14px; height: 2px; background: var(--text3); border-radius: 1px; }
 .block-emoji { font-size: 20px; flex-shrink: 0; width: 32px; text-align: center; }
 .block-info { flex: 1; min-width: 0; }
 .block-name { font-size: 15px; font-weight: 500; color: var(--text); }
@@ -217,6 +230,26 @@ body {
   font-size: 13px; color: transparent;
 }
 .block-item.done .block-check { background: var(--success); border-color: var(--success); color: #fff; }
+/* ── INLINE NOTE ── */
+.block-note-row {
+  margin-top: 4px; padding: 8px 12px; background: var(--surface2);
+  border-radius: 0 0 var(--radius) var(--radius);
+  border: 1px solid var(--border); border-top: none;
+  font-size: 13px; color: var(--text2); line-height: 1.6;
+}
+.block-note-bullets { list-style: none; padding: 0; margin: 0; }
+.block-note-bullets li { padding: 1px 0; padding-left: 14px; position: relative; }
+.block-note-bullets li::before { content: '•'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+/* ── NOTE FIELD IN MODAL ── */
+.note-field-wrap { position: relative; }
+.note-field-wrap textarea {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 10px 12px; font-size: 14px;
+  color: var(--text); font-family: var(--font); resize: none; min-height: 90px;
+  line-height: 1.6;
+}
+.note-field-wrap textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+.note-hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
 
 /* ── DAY SELECTOR ── */
 .day-selector { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
@@ -225,14 +258,16 @@ body {
   flex-shrink: 0; padding: 7px 10px; border-radius: 14px;
   border: 1px solid var(--border2); background: var(--surface);
   font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer;
-  transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 1px;
-  min-width: 44px;
+  transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 0px;
+  min-width: 48px;
 }
 .day-pill .d-name { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; }
-.day-pill .d-num { font-size: 16px; font-weight: 700; }
-.day-pill .d-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-top: 2px; }
+.day-pill .d-num { font-size: 16px; font-weight: 700; line-height: 1.2; }
+.day-pill .d-mon { font-size: 10px; font-weight: 500; color: var(--text3); line-height: 1.2; }
+.day-pill .d-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-top: 3px; }
 .day-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .day-pill.active .d-name { color: rgba(255,255,255,0.7); }
+.day-pill.active .d-mon { color: rgba(255,255,255,0.7); }
 .day-pill.active .d-dot { background: rgba(255,255,255,0.8); }
 .day-pill.has-perfect .d-dot { background: var(--success); }
 .day-pill.active.has-perfect .d-dot { background: #fff; }
@@ -388,10 +423,11 @@ body {
 .btn-delete { background: #fee2e2; color: #dc2626; }
 @media (prefers-color-scheme: dark) { .btn-delete { background: #3b1010; color: #fc6060; } }
 .block-edit-btn {
-  width: 30px; height: 30px; border-radius: 8px; border: none;
-  background: transparent; color: var(--text3); font-size: 16px;
+  width: 28px; height: 28px; border-radius: 8px; border: none;
+  background: transparent; color: var(--text3); font-size: 14px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; transition: background 0.15s, color 0.15s;
+  margin-right: 4px;
 }
 .block-edit-btn:hover { background: var(--surface2); color: var(--text); }
 .block-edit-btn:active { opacity: 0.6; }
@@ -429,8 +465,38 @@ body {
 .score-low { background: var(--warning-bg); color: var(--warning); }
 .score-mid { background: var(--accent-bg); color: var(--accent-text); }
 .score-high { background: var(--success-bg); color: var(--success-text); }
+/* ── SELECT MODE ── */
+.block-item.selected {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+.block-item.selected .block-name { color: var(--accent-text); }
+.select-check {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid var(--border2); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: transparent; background: var(--surface);
+  transition: background 0.15s, border-color 0.15s;
+}
+.block-item.selected .select-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+.select-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface); border-radius: var(--radius);
+  border: 1px solid var(--border2); padding: 10px 14px;
+  margin-bottom: 10px; gap: 10px;
+  animation: popIn 0.2s ease;
+}
+.select-bar-label { font-size: 14px; font-weight: 500; color: var(--text); flex:1; }
+.select-bar-actions { display: flex; gap: 8px; align-items: center; }
+.btn-select-all { background: var(--surface2); color: var(--text2); border: none; border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.btn-select-all:active { opacity: 0.7; }
+.btn-bulk-delete { background: #fee2e2; color: #dc2626; border: none; border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.btn-bulk-delete:active { opacity: 0.7; }
+.btn-cancel-select { background: transparent; color: var(--text3); border: none; padding: 6px 4px; font-size: 13px; cursor: pointer; }
+@media (prefers-color-scheme: dark) { .btn-bulk-delete { background: #3b1010 !important; color: #fc6060 !important; } }
+[data-theme="dark"] .btn-bulk-delete { background: #3b1010; color: #fc6060; }
+[data-theme="light"] .btn-bulk-delete { background: #fee2e2; color: #dc2626; }
 </style>
-</head>
 <body>
 
 <div class="nav">
@@ -458,6 +524,7 @@ body {
   <div id="ring-area"></div>
   <div id="now-card-area"></div>
   <div id="day-selector-wrap"></div>
+  <div id="select-bar-wrap"></div>
   <div class="section-head">
     <div class="section-title" id="day-heading">Today</div>
     <button class="add-btn" onclick="openAddBlock()">+ Add</button>
@@ -522,6 +589,13 @@ body {
       </div>
     </div>
     <div class="field"><label>Color</label><div class="color-grid" id="color-grid"></div></div>
+    <div class="field" id="note-field-wrap" style="display:none">
+      <label>Notes <span style="font-size:11px;color:var(--text3);font-weight:400">(one bullet per line)</span></label>
+      <div class="note-field-wrap">
+        <textarea id="b-note" placeholder="e.g. Don't skip warm-up&#10;Drink water after&#10;Focus on form"></textarea>
+      </div>
+      <div class="note-hint">Each line becomes a bullet point shown under the block.</div>
+    </div>
     <div class="modal-actions" id="modal-block-actions">
       <button class="btn-cancel" onclick="closeModals()">Cancel</button>
       <button class="btn-save" onclick="saveBlock()">Save</button>
@@ -647,6 +721,10 @@ let selectedDay = todayKey();
 let selectedColor = 'amber';
 let selectedEmoji = '☀️';
 let activeTab = 'day';
+let selectMode = false;
+let selectedBlocks = new Set();
+let longPressTimer = null;
+let dragSrcId = null;
 
 function loadState() {
   try {
@@ -858,6 +936,8 @@ function getPickedTime() {
 function openAddBlock() {
   editingBlockId = null;
   document.getElementById('b-name').value='';
+  document.getElementById('b-note').value='';
+  document.getElementById('note-field-wrap').style.display='none';
   document.getElementById('modal-block-title').textContent='Add time block';
   document.getElementById('modal-block-actions').innerHTML=`
     <button class="btn-cancel" onclick="closeModals()">Cancel</button>
@@ -877,6 +957,11 @@ function openEditBlock(dk, id) {
   if (!b) return;
   editingBlockId = id;
   document.getElementById('b-name').value = b.name;
+  // show note field pre-filled when editing
+  const noteWrap = document.getElementById('note-field-wrap');
+  const noteEl = document.getElementById('b-note');
+  noteWrap.style.display = 'block';
+  noteEl.value = (b.notes||[]).join('\n');
   document.getElementById('modal-block-title').textContent = 'Edit block';
   document.getElementById('modal-block-actions').innerHTML=`
     <button class="btn-delete" onclick="deleteBlock('${dk}','${id}')">Delete</button>
@@ -946,12 +1031,14 @@ function saveBlock() {
   const name=document.getElementById('b-name').value.trim();
   if (!name) return;
   const time=getPickedTime();
+  const noteRaw=document.getElementById('b-note').value;
+  const notes=noteRaw.split('\n').map(s=>s.trim()).filter(Boolean);
   if (!state.blocks[selectedDay]) state.blocks[selectedDay]=[];
   if (editingBlockId) {
     const b=state.blocks[selectedDay].find(x=>x.id===editingBlockId);
-    if (b) { b.name=name; b.time=time; b.color=selectedColor; b.emoji=selectedEmoji; }
+    if (b) { b.name=name; b.time=time; b.color=selectedColor; b.emoji=selectedEmoji; b.notes=notes; }
   } else {
-    state.blocks[selectedDay].push({id:`c${Date.now()}`,name,time,color:selectedColor,emoji:selectedEmoji,done:false});
+    state.blocks[selectedDay].push({id:`c${Date.now()}`,name,time,color:selectedColor,emoji:selectedEmoji,done:false,notes});
   }
   saveState(); closeModals(); render();
 }
@@ -996,7 +1083,7 @@ function toggleHabit(hid, dk, el) {
   render();
 }
 
-function selectDay(dk) { selectedDay=dk; render(); }
+function selectDay(dk) { selectedDay=dk; selectMode=false; selectedBlocks=new Set(); render(); }
 
 function habitStreak(hid) {
   let streak=0;
@@ -1008,6 +1095,141 @@ function habitStreak(hid) {
     else if (i>0) break;
   }
   return streak;
+}
+
+// ── DRAG TO REORDER ───────────────────────────────────────────
+function onDragStart(e, id) {
+  dragSrcId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+  setTimeout(()=>{ const el=document.getElementById('bi-'+id); if(el) el.classList.add('dragging'); }, 0);
+}
+function onDragEnd(e, id) {
+  dragSrcId = null;
+  document.querySelectorAll('.block-item').forEach(el=>{ el.classList.remove('dragging','drag-over'); });
+}
+function onDragOver(e, id) {
+  e.preventDefault(); e.dataTransfer.dropEffect='move';
+  document.querySelectorAll('.block-item').forEach(el=>el.classList.remove('drag-over'));
+  const el=document.getElementById('bi-'+id);
+  if (el && id!==dragSrcId) el.classList.add('drag-over');
+}
+function onDrop(e, targetId) {
+  e.preventDefault();
+  if (!dragSrcId || dragSrcId===targetId) return;
+  const blocks = state.blocks[selectedDay];
+  const srcIdx = blocks.findIndex(b=>b.id===dragSrcId);
+  const tgtIdx = blocks.findIndex(b=>b.id===targetId);
+  if (srcIdx<0||tgtIdx<0) return;
+  const [moved] = blocks.splice(srcIdx,1);
+  blocks.splice(tgtIdx,0,moved);
+  saveState(); render();
+}
+
+// touch-based drag (mobile)
+let touchDragId = null;
+let touchClone = null;
+let touchStartY = 0;
+function onTouchDragStart(e, id) {
+  if (selectMode) return;
+  touchDragId = id;
+  touchStartY = e.touches[0].clientY;
+  const src = document.getElementById('bi-'+id);
+  if (!src) return;
+  touchClone = src.cloneNode(true);
+  touchClone.style.cssText = `position:fixed;left:${src.getBoundingClientRect().left}px;top:${src.getBoundingClientRect().top}px;width:${src.offsetWidth}px;opacity:0.85;z-index:999;pointer-events:none;transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,0.2);border-radius:12px;`;
+  document.body.appendChild(touchClone);
+  src.style.opacity='0.3';
+}
+function onTouchDragMove(e, id) {
+  if (!touchDragId || !touchClone) return;
+  e.preventDefault();
+  const dy = e.touches[0].clientY - touchStartY;
+  touchClone.style.transform = `translateY(${dy}px) scale(1.02)`;
+  // find which block we're hovering
+  document.querySelectorAll('.block-item').forEach(el=>el.classList.remove('drag-over'));
+  const touch = e.touches[0];
+  const els = document.elementsFromPoint(touch.clientX, touch.clientY);
+  for (const el of els) {
+    if (el.classList.contains('block-item') && el.id !== 'bi-'+touchDragId) {
+      el.classList.add('drag-over'); break;
+    }
+  }
+}
+function onTouchDragEnd(e, id) {
+  if (!touchDragId) return;
+  const src = document.getElementById('bi-'+id);
+  if (src) src.style.opacity='';
+  if (touchClone) { touchClone.remove(); touchClone=null; }
+  // find drop target
+  const touch = e.changedTouches[0];
+  const els = document.elementsFromPoint(touch.clientX, touch.clientY);
+  for (const el of els) {
+    if (el.classList.contains('block-item') && el.id && el.id !== 'bi-'+touchDragId) {
+      const targetId = el.id.replace('bi-','');
+      const blocks = state.blocks[selectedDay];
+      const srcIdx = blocks.findIndex(b=>b.id===touchDragId);
+      const tgtIdx = blocks.findIndex(b=>b.id===targetId);
+      if (srcIdx>=0&&tgtIdx>=0) {
+        const [moved]=blocks.splice(srcIdx,1);
+        blocks.splice(tgtIdx,0,moved);
+        saveState();
+      }
+      break;
+    }
+  }
+  document.querySelectorAll('.block-item').forEach(el=>el.classList.remove('drag-over'));
+  touchDragId=null; render();
+}
+
+// ── SELECT MODE ───────────────────────────────────────────────
+function enterSelectMode(id) {
+  selectMode = true;
+  selectedBlocks = new Set([id]);
+  // vibrate on supported devices
+  if (navigator.vibrate) navigator.vibrate(40);
+  render();
+}
+
+function exitSelectMode() {
+  selectMode = false;
+  selectedBlocks = new Set();
+  render();
+}
+
+function toggleBlockSelect(id) {
+  if (selectedBlocks.has(id)) selectedBlocks.delete(id);
+  else selectedBlocks.add(id);
+  if (selectedBlocks.size === 0) exitSelectMode();
+  else render();
+}
+
+function selectAllBlocks() {
+  const blocks = state.blocks[selectedDay] || [];
+  selectedBlocks = new Set(blocks.map(b => b.id));
+  render();
+}
+
+function deleteSelectedBlocks() {
+  if (!selectedBlocks.size) return;
+  state.blocks[selectedDay] = (state.blocks[selectedDay] || []).filter(b => !selectedBlocks.has(b.id));
+  saveState();
+  exitSelectMode();
+}
+
+function onBlockPointerDown(e, id) {
+  longPressTimer = setTimeout(() => {
+    longPressTimer = null;
+    enterSelectMode(id);
+  }, 500);
+}
+
+function onBlockPointerUp() {
+  if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+}
+
+function onBlockPointerLeave() {
+  if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
 }
 
 // ── RENDER ─────────────────────────────────────────────────────
@@ -1029,9 +1251,11 @@ function renderDay(dates) {
       const dk=dateKey(d);
       const bl=state.blocks[dk]||[];
       const perfect=bl.length>0&&bl.every(b=>b.done);
+      const mon=d.toLocaleString('default',{month:'short'});
       return `<div class="day-pill ${dk===selectedDay?'active':''} ${perfect?'has-perfect':''}" onclick="selectDay('${dk}')">
         <span class="d-name">${DAYS_SHORT[d.getDay()]}</span>
         <span class="d-num">${d.getDate()}</span>
+        <span class="d-mon">${mon}</span>
         <span class="d-dot"></span>
       </div>`;
     }).join('')
@@ -1073,18 +1297,71 @@ function renderDay(dates) {
     isToday(selDate)?`Today — ${done}/${blocks.length}`
     :`${DAYS_SHORT[selDate.getDay()]} ${selDate.getMonth()+1}/${selDate.getDate()} — ${done}/${blocks.length}`;
 
+  // select bar
+  const selWrap = document.getElementById('select-bar-wrap');
+  if (selectMode && blocks.length) {
+    const n = selectedBlocks.size;
+    const allSel = n === blocks.length;
+    selWrap.innerHTML = `<div class="select-bar">
+      <div class="select-bar-label">${n} selected</div>
+      <div class="select-bar-actions">
+        <button class="btn-select-all" onclick="${allSel?'exitSelectMode()':'selectAllBlocks()'}">${allSel?'Deselect all':'Select all'}</button>
+        <button class="btn-bulk-delete" onclick="deleteSelectedBlocks()" ${n===0?'disabled':''}>Delete ${n>0?n:''}</button>
+        <button class="btn-cancel-select" onclick="exitSelectMode()">✕</button>
+      </div>
+    </div>`;
+  } else {
+    selWrap.innerHTML = '';
+  }
+
   document.getElementById('blocks-list').innerHTML=blocks.length
     ? blocks.map(b=>{
         const c=COLORS.find(x=>x.id===b.color)||COLORS[0];
-        return `<div class="block-item ${b.done?'done':''}" id="bi-${b.id}" onclick="toggleBlock('${selectedDay}','${b.id}',this)">
-          <div class="block-emoji">${b.emoji||'🎯'}</div>
-          <div class="block-info">
-            <div class="block-name">${b.name}</div>
-            ${b.time?`<div class="block-time">${b.time}</div>`:''}
-          </div>
-          <button class="block-edit-btn" onclick="event.stopPropagation();openEditBlock('${selectedDay}','${b.id}')">✎</button>
-          <div class="block-check" style="border-color:${b.done?'':c.dot}">${b.done?'✓':''}</div>
-        </div>`;
+        const isSel = selectedBlocks.has(b.id);
+        const hasNotes = b.notes && b.notes.length > 0;
+        if (selectMode) {
+          return `<div class="block-item ${isSel?'selected':''}"
+            onclick="toggleBlockSelect('${b.id}')"
+            onpointerdown="onBlockPointerDown(event,'${b.id}')"
+            onpointerup="onBlockPointerUp()"
+            onpointerleave="onBlockPointerLeave()">
+            <div class="select-check">${isSel?'✓':''}</div>
+            <div class="block-emoji">${b.emoji||'🎯'}</div>
+            <div class="block-info">
+              <div class="block-name">${b.name}</div>
+              ${b.time?`<div class="block-time">${b.time}</div>`:''}
+            </div>
+          </div>`;
+        }
+        const noteHTML = hasNotes ? `<div class="block-note-row">
+          <ul class="block-note-bullets">${b.notes.map(n=>`<li>${n}</li>`).join('')}</ul>
+        </div>` : '';
+        return `<div style="margin-bottom:${hasNotes?'8px':'0'}">
+          <div class="block-item ${b.done?'done':''} ${hasNotes?'':''}' style="border-radius:${hasNotes?'var(--radius) var(--radius) 0 0':'var(--radius)'};margin-bottom:0" id="bi-${b.id}"
+            draggable="true"
+            ondragstart="onDragStart(event,'${b.id}')"
+            ondragend="onDragEnd(event,'${b.id}')"
+            ondragover="onDragOver(event,'${b.id}')"
+            ondrop="onDrop(event,'${b.id}')"
+            ontouchstart="onTouchDragStart(event,'${b.id}')"
+            ontouchmove="onTouchDragMove(event,'${b.id}')"
+            ontouchend="onTouchDragEnd(event,'${b.id}')"
+            onpointerdown="onBlockPointerDown(event,'${b.id}')"
+            onpointerup="onBlockPointerUp()"
+            onpointerleave="onBlockPointerLeave()">
+            <div class="drag-handle" onclick="event.stopPropagation()" ondragstart="event.stopPropagation();onDragStart(event,'${b.id}')">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="block-emoji" onclick="toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.emoji||'🎯'}</div>
+            <div class="block-info" onclick="toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item}'))">
+              <div class="block-name">${b.name}</div>
+              ${b.time?`<div class="block-time">${b.time}</div>`:''}
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px;">
+              <button class="block-edit-btn" onclick="event.stopPropagation();openEditBlock('${selectedDay}','${b.id}')" title="Edit">✎</button>
+              <div class="block-check" style="border-color:${b.done?'':c.dot}" onclick="event.stopPropagation();toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.done?'✓':''}</div>
+            </div>
+          </div>${noteHTML}</div>`;
       }).join('')
     : `<div class="empty"><strong>No blocks</strong>Tap + to add your first block.</div>`;
 }

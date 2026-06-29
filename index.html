@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="My Routine" />
@@ -390,7 +390,7 @@ body {
 }
 
 /* ── TIME PICKER ── */
-.time-picker { display: flex; gap: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border2); background: var(--surface2); height: 160px; position: relative; }
+.time-picker { display: flex; gap: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border2); background: var(--surface2); height: 144px; position: relative; }
 .time-picker::before, .time-picker::after {
   content:''; position: absolute; left:0; right:0; height: 52px; pointer-events: none; z-index: 2;
 }
@@ -399,8 +399,8 @@ body {
 .tp-col { flex: 1; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .tp-col::-webkit-scrollbar { display: none; }
 .tp-item {
-  height: 44px; display: flex; align-items: center; justify-content: center;
-  font-size: 20px; font-weight: 600; color: var(--text2); scroll-snap-align: center;
+  height: 40px; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 600; color: var(--text2); scroll-snap-align: center;
   cursor: pointer; transition: color 0.15s;
   padding: 0 4px;
 }
@@ -417,19 +417,19 @@ body {
 .modal {
   background: var(--surface); border-radius: 22px 22px 0 0;
   width: 100%; max-width: 540px;
-  padding: 20px 20px calc(20px + var(--safe-bottom));
-  max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain;
+  padding: 16px 16px calc(16px + var(--safe-bottom));
+  max-height: 90dvh; overflow-y: auto; overscroll-behavior: contain;
 }
 @media (min-width: 600px) {
   .modal-overlay { align-items: center; padding: 20px; }
-  .modal { border-radius: 20px; max-height: 85dvh; padding: 28px; }
+  .modal { border-radius: 20px; max-height: 85dvh; padding: 24px; }
 }
 .modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 16px; }
 @media (min-width: 600px) { .modal-handle { display: none; } }
-.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
-.field { margin-bottom: 14px; }
-.field label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
-.field input, .field select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 11px 12px; font-size: 15px; color: var(--text); font-family: var(--font); }
+.modal-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; }
+.field { margin-bottom: 10px; }
+.field label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 4px; }
+.field input, .field select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 11px 12px; font-size: 16px; color: var(--text); font-family: var(--font); }
 .field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
 .modal-row-pair { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 4px; }
 .emoji-grid { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -439,7 +439,7 @@ body {
 .emoji-picker-wrap { display: flex; flex-direction: column; gap: 10px; }
 .emoji-preview-row { display: flex; align-items: center; gap: 10px; }
 .emoji-preview {
-  width: 56px; height: 56px; border-radius: 14px; font-size: 30px;
+  width: 48px; height: 48px; border-radius: 12px; font-size: 26px;
   background: var(--surface2); border: 2px solid var(--border2);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   transition: border-color 0.2s;
@@ -448,7 +448,7 @@ body {
 .emoji-tap-btn {
   flex: 1; background: var(--accent-bg); color: var(--accent-text);
   border: 1.5px dashed var(--border-accent, var(--accent)); border-radius: var(--radius);
-  padding: 12px; font-size: 14px; font-weight: 500; cursor: pointer; text-align: center;
+  padding: 8px; font-size: 13px; font-weight: 500; cursor: pointer; text-align: center;
   line-height: 1.4;
 }
 .emoji-tap-btn:active { opacity: 0.7; }
@@ -463,8 +463,8 @@ body {
 .emoji-input-hint { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; opacity: 0.4; }
 .emoji-recents { display: flex; gap: 6px; flex-wrap: wrap; }
 .emoji-recent-item {
-  width: 38px; height: 38px; border-radius: 10px; border: 1.5px solid var(--border2);
-  background: var(--surface2); cursor: pointer; font-size: 20px;
+  width: 34px; height: 34px; border-radius: 8px; border: 1.5px solid var(--border2);
+  background: var(--surface2); cursor: pointer; font-size: 18px;
   display: flex; align-items: center; justify-content: center;
   transition: border-color 0.15s, transform 0.1s;
 }
@@ -472,10 +472,10 @@ body {
 .emoji-recent-item.sel { border-color: var(--accent); background: var(--accent-bg); }
 .color-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 .color-grid.col { flex-direction: row; flex-wrap: wrap; max-width: 80px; }
-.color-swatch { width: 32px; height: 32px; border-radius: 8px; cursor: pointer; border: 3px solid transparent; transition: border-color 0.15s, transform 0.1s; flex-shrink: 0; }
+.color-swatch { width: 28px; height: 28px; border-radius: 7px; cursor: pointer; border: 3px solid transparent; transition: border-color 0.15s, transform 0.1s; flex-shrink: 0; }
 .color-swatch.sel { border-color: var(--text); transform: scale(1.1); }
-.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-.modal-actions button { flex: 1; padding: 14px; border-radius: var(--radius); border: 1.5px solid transparent; font-size: 15px; font-weight: 600; cursor: pointer; }
+.modal-actions { display: flex; gap: 8px; margin-top: 14px; }
+.modal-actions button { flex: 1; padding: 12px; border-radius: var(--radius); border: 1.5px solid transparent; font-size: 14px; font-weight: 600; cursor: pointer; }
 .btn-cancel { background: var(--surface2); color: var(--text2); border-color: var(--border2); }
 .btn-save { background: var(--accent); color: #fff; }
 .btn-cancel:active, .btn-save:active { opacity: 0.75; }
@@ -519,7 +519,7 @@ body {
   flex-shrink: 0; line-height: 1.5; margin-top: 1px; user-select: none;
 }
 .bullet-line input {
-  flex: 1; border: none; background: transparent; font-size: 13px;
+  flex: 1; border: none; background: transparent; font-size: 16px;
   color: var(--text); font-family: var(--font); line-height: 1.5;
   padding: 2px 0; outline: none;
 }
@@ -822,11 +822,11 @@ body {
     <div class="modal-handle"></div>
     <div class="modal-title" id="modal-block-title">Add time block</div>
 
-    <div class="field"><label>Name</label><input id="b-name" placeholder="e.g. Morning workout" /></div>
+    <div class="field"><label>Name</label><input id="b-name" placeholder="e.g. Morning workout" style="font-size:16px" /></div>
 
     <div class="field">
       <label>Time <span id="time-display" style="color:var(--accent);font-weight:600;margin-left:6px"></span></label>
-      <div class="time-picker" id="time-picker" style="height:132px;">
+      <div class="time-picker" id="time-picker" style="height:120px;">
         <div class="tp-selector"></div>
         <div class="tp-col" id="tp-hour"></div>
         <div class="tp-col" id="tp-min"></div>
@@ -847,7 +847,7 @@ body {
           <div class="emoji-input-wrap" style="margin-top:8px;">
             <span class="emoji-input-hint">🔍</span>
             <input id="emoji-input" placeholder="  paste emoji" maxlength="8"
-              oninput="onEmojiInput(this.value)" autocomplete="off" autocorrect="off" style="font-size:18px;padding:8px 10px 8px 34px;" />
+              oninput="onEmojiInput(this.value)" autocomplete="off" autocorrect="off" style="font-size:16px;padding:8px 10px 8px 34px;" />
           </div>
           <div id="emoji-recents-wrap" style="display:none;margin-top:8px;">
             <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Recent</div>
@@ -873,7 +873,7 @@ body {
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title" id="modal-habit-title">Add habit</div>
-    <div class="field"><label>Habit name</label><input id="h-name" placeholder="e.g. No phone before breakfast" /></div>
+    <div class="field"><label>Habit name</label><input id="h-name" placeholder="e.g. No phone before breakfast" style="font-size:16px" /></div>
     <div class="modal-actions" id="modal-habit-actions">
       <button class="btn-cancel" onclick="closeModals()">Cancel</button>
       <button class="btn-save" onclick="saveHabit()">Save</button>
@@ -1427,12 +1427,12 @@ function initTimePicker() {
 
   function buildCol(id, items, selected, fmt) {
     const col = document.getElementById(id);
-    col.innerHTML = '<div style="height:58px"></div>' +
+    col.innerHTML = '<div style="height:52px"></div>' +
       items.map(v=>`<div class="tp-item ${fmt(v)===fmt(selected)?'selected':''}" data-val="${v}">${fmt(v)}</div>`).join('') +
-      '<div style="height:58px"></div>';
+      '<div style="height:52px"></div>';
     // scroll to selected
     const idx = items.indexOf(typeof selected==='number'?selected:items.find(x=>x===selected));
-    col.scrollTop = idx * 44;
+    col.scrollTop = idx * 40;
     col.onscroll = () => onScroll(id, items, fmt);
   }
 
@@ -1446,7 +1446,7 @@ function initTimePicker() {
 
 function onScroll(id, items, fmt) {
   const col = document.getElementById(id);
-  const idx = Math.round(col.scrollTop / 44);
+  const idx = Math.round(col.scrollTop / 40);
   const val = items[Math.max(0, Math.min(idx, items.length-1))];
   if (id==='tp-hour') TP.h = val;
   else if (id==='tp-min') TP.m = val;
@@ -1670,19 +1670,41 @@ let touchClone = null;
 let touchStartY = 0;
 let touchStartX = 0;
 let touchDragActive = false;
+let touchHoldTimer = null;
+let touchHoldReady = false; // true only after 200ms hold
+
 function onTouchDragStart(e, id) {
   if (selectMode) return;
   touchDragId = id;
   touchStartY = e.touches[0].clientY;
   touchStartX = e.touches[0].clientX;
   touchDragActive = false;
+  touchHoldReady = false;
+  // require a 200ms hold before drag is allowed — this separates scroll from drag
+  touchHoldTimer = setTimeout(() => {
+    touchHoldReady = true;
+    // give a subtle haptic hint if available
+    if (navigator.vibrate) navigator.vibrate(20);
+  }, 200);
 }
+
 function onTouchDragMove(e, id) {
   if (!touchDragId) return;
   const dy = e.touches[0].clientY - touchStartY;
   const dx = e.touches[0].clientX - touchStartX;
-  // only activate drag after moving 8px vertically — prevents tap from triggering drag
-  if (!touchDragActive && Math.abs(dy) < 8) return;
+
+  // if they moved too far before hold timer fired, cancel — they're scrolling
+  if (!touchHoldReady) {
+    if (Math.abs(dy) > 6 || Math.abs(dx) > 6) {
+      clearTimeout(touchHoldTimer);
+      touchHoldTimer = null;
+      touchDragId = null;
+    }
+    return;
+  }
+
+  // hold confirmed — now activate drag on first significant vertical move
+  if (!touchDragActive && Math.abs(dy) < 4) return;
   if (!touchDragActive) {
     touchDragActive = true;
     const src = document.getElementById('bi-'+id);
@@ -1704,14 +1726,17 @@ function onTouchDragMove(e, id) {
     }
   }
 }
+
 function onTouchDragEnd(e, id) {
+  clearTimeout(touchHoldTimer);
+  touchHoldTimer = null;
+  touchHoldReady = false;
   if (!touchDragId) return;
   const src = document.getElementById('bi-'+id);
   if (src) src.style.opacity='';
   if (touchClone) { touchClone.remove(); touchClone=null; }
-  if (!touchDragActive) { touchDragId=null; return; } // was just a tap
+  if (!touchDragActive) { touchDragId=null; return; }
   touchDragActive = false;
-  // find drop target
   const touch = e.changedTouches[0];
   const els = document.elementsFromPoint(touch.clientX, touch.clientY);
   for (const el of els) {

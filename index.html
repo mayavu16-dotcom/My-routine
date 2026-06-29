@@ -2069,19 +2069,28 @@ function applyUnifiedCopy() {
   pushUndo('Copy undone');
   targetDays.forEach(dk => {
     if (!state.blocks[dk]) state.blocks[dk] = [];
-    // add new blocks or update time/color/emoji on existing ones
+    // match by name + time together — two blocks with same name but different times are distinct
     srcBlocks.forEach(b => {
-      const existing = state.blocks[dk].find(x => x.name === b.name);
+      const existing = state.blocks[dk].find(x => x.name === b.name && x.time === b.time);
       if (existing) {
-        // update time and appearance but preserve done state and notes
-        existing.time = b.time;
+        // same name + same time already exists — just update color and emoji
         existing.color = b.color;
         existing.emoji = b.emoji;
       } else {
-        state.blocks[dk].push({ ...b, id:`copy-${Date.now()}-${Math.random().toString(36).slice(2)}`, done:false });
+        // check if same name exists at a DIFFERENT time — update that one's time
+        const sameNameDiffTime = state.blocks[dk].find(x => x.name === b.name && x.time !== b.time);
+        if (sameNameDiffTime && srcBlocks.filter(s => s.name === b.name).length === 1) {
+          // only one block with this name in source — treat as a time edit
+          sameNameDiffTime.time = b.time;
+          sameNameDiffTime.color = b.color;
+          sameNameDiffTime.emoji = b.emoji;
+        } else {
+          // new block (or duplicate name at new time) — add it
+          state.blocks[dk].push({ ...b, id:`copy-${Date.now()}-${Math.random().toString(36).slice(2)}`, done:false });
+        }
       }
     });
-    // re-sort the whole day's blocks by time to preserve order
+    // re-sort by time
     state.blocks[dk].sort((a, b) => timeToMins(a.time) - timeToMins(b.time));
   });
 

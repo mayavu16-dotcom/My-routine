@@ -1985,17 +1985,33 @@ function applyUnifiedCopy() {
   }
   if (!srcBlocks.length) { closeModals(); return; }
 
-  pushUndo(`Copy undone`);
+  // helper: parse "7:00 AM" → minutes since midnight for sorting
+  function timeToMins(t) {
+    if (!t) return 9999;
+    const m = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!m) return 9999;
+    let h = parseInt(m[1]), mn = parseInt(m[2]);
+    const pm = m[3].toUpperCase() === 'PM';
+    if (pm && h !== 12) h += 12;
+    if (!pm && h === 12) h = 0;
+    return h * 60 + mn;
+  }
+
+  pushUndo('Copy undone');
   targetDays.forEach(dk => {
     if (!state.blocks[dk]) state.blocks[dk] = [];
+    // add only blocks not already present by name
     srcBlocks.forEach(b => {
       if (!state.blocks[dk].find(x => x.name === b.name)) {
         state.blocks[dk].push({ ...b, id:`copy-${Date.now()}-${Math.random().toString(36).slice(2)}`, done:false });
       }
     });
+    // re-sort the whole day's blocks by time to preserve order
+    state.blocks[dk].sort((a, b) => timeToMins(a.time) - timeToMins(b.time));
   });
+
   saveState(); closeModals(); render();
-  const what = mode === 'all' ? `${srcBlocks.length} block${srcBlocks.length>1?'s':''}` : `${srcBlocks.length} block${srcBlocks.length>1?'s':''}`;
+  const what = `${srcBlocks.length} block${srcBlocks.length>1?'s':''}`;
   showUndoToast(`Copied ${what} to ${targetDays.length} day${targetDays.length>1?'s':''}`);
 }
 

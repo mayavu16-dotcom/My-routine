@@ -188,6 +188,10 @@ body {
 .section-title { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; }
 .add-btn { background: var(--accent-bg); color: var(--accent-text); border: none; border-radius: 8px; padding: 5px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
 .add-btn:active { opacity: 0.7; }
+.trash-btn { background: transparent; border: 0.5px solid var(--border2); border-radius: 8px; padding: 5px 9px; font-size: 15px; cursor: pointer; color: var(--text2); transition: background 0.15s; }
+.trash-btn:hover { background: #fee2e2; }
+.trash-btn:active { opacity: 0.6; }
+[data-theme="dark"] .trash-btn:hover { background: #3b1010; }
 
 /* ── BLOCKS ── */
 .blocks-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 24px; }
@@ -527,7 +531,10 @@ body {
   <div id="select-bar-wrap"></div>
   <div class="section-head">
     <div class="section-title" id="day-heading">Today</div>
-    <button class="add-btn" onclick="openAddBlock()">+ Add</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="trash-btn" id="trash-btn" onclick="enterSelectMode()" title="Delete blocks">🗑</button>
+      <button class="add-btn" onclick="openAddBlock()">+ Add</button>
+    </div>
   </div>
   <div class="blocks-list" id="blocks-list"></div>
 </div>
@@ -1183,11 +1190,9 @@ function onTouchDragEnd(e, id) {
 }
 
 // ── SELECT MODE ───────────────────────────────────────────────
-function enterSelectMode(id) {
+function enterSelectMode() {
   selectMode = true;
-  selectedBlocks = new Set([id]);
-  // vibrate on supported devices
-  if (navigator.vibrate) navigator.vibrate(40);
+  selectedBlocks = new Set();
   render();
 }
 
@@ -1200,8 +1205,7 @@ function exitSelectMode() {
 function toggleBlockSelect(id) {
   if (selectedBlocks.has(id)) selectedBlocks.delete(id);
   else selectedBlocks.add(id);
-  if (selectedBlocks.size === 0) exitSelectMode();
-  else render();
+  render();
 }
 
 function selectAllBlocks() {
@@ -1215,21 +1219,6 @@ function deleteSelectedBlocks() {
   state.blocks[selectedDay] = (state.blocks[selectedDay] || []).filter(b => !selectedBlocks.has(b.id));
   saveState();
   exitSelectMode();
-}
-
-function onBlockPointerDown(e, id) {
-  longPressTimer = setTimeout(() => {
-    longPressTimer = null;
-    enterSelectMode(id);
-  }, 500);
-}
-
-function onBlockPointerUp() {
-  if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-}
-
-function onBlockPointerLeave() {
-  if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
 }
 
 // ── RENDER ─────────────────────────────────────────────────────
@@ -1297,17 +1286,21 @@ function renderDay(dates) {
     isToday(selDate)?`Today — ${done}/${blocks.length}`
     :`${DAYS_SHORT[selDate.getDay()]} ${selDate.getMonth()+1}/${selDate.getDate()} — ${done}/${blocks.length}`;
 
+  // show/hide trash + add buttons
+  const trashBtn = document.getElementById('trash-btn');
+  if (trashBtn) trashBtn.style.display = selectMode ? 'none' : '';
+
   // select bar
   const selWrap = document.getElementById('select-bar-wrap');
   if (selectMode && blocks.length) {
     const n = selectedBlocks.size;
     const allSel = n === blocks.length;
     selWrap.innerHTML = `<div class="select-bar">
-      <div class="select-bar-label">${n} selected</div>
+      <div class="select-bar-label">${n === 0 ? 'Tap blocks to select' : `${n} selected`}</div>
       <div class="select-bar-actions">
         <button class="btn-select-all" onclick="${allSel?'exitSelectMode()':'selectAllBlocks()'}">${allSel?'Deselect all':'Select all'}</button>
-        <button class="btn-bulk-delete" onclick="deleteSelectedBlocks()" ${n===0?'disabled':''}>Delete ${n>0?n:''}</button>
-        <button class="btn-cancel-select" onclick="exitSelectMode()">✕</button>
+        <button class="btn-bulk-delete" onclick="deleteSelectedBlocks()" ${n===0?'disabled':''}>🗑 Delete${n>0?` ${n}`:''}</button>
+        <button class="btn-cancel-select" onclick="exitSelectMode()">✕ Cancel</button>
       </div>
     </div>`;
   } else {
@@ -1320,11 +1313,7 @@ function renderDay(dates) {
         const isSel = selectedBlocks.has(b.id);
         const hasNotes = b.notes && b.notes.length > 0;
         if (selectMode) {
-          return `<div class="block-item ${isSel?'selected':''}"
-            onclick="toggleBlockSelect('${b.id}')"
-            onpointerdown="onBlockPointerDown(event,'${b.id}')"
-            onpointerup="onBlockPointerUp()"
-            onpointerleave="onBlockPointerLeave()">
+          return `<div class="block-item ${isSel?'selected':''}" onclick="toggleBlockSelect('${b.id}')">
             <div class="select-check">${isSel?'✓':''}</div>
             <div class="block-emoji">${b.emoji||'🎯'}</div>
             <div class="block-info">
@@ -1336,24 +1325,24 @@ function renderDay(dates) {
         const noteHTML = hasNotes ? `<div class="block-note-row">
           <ul class="block-note-bullets">${b.notes.map(n=>`<li>${n}</li>`).join('')}</ul>
         </div>` : '';
-        return `<div style="margin-bottom:${hasNotes?'8px':'0'}">
-          <div class="block-item ${b.done?'done':''} ${hasNotes?'':''}' style="border-radius:${hasNotes?'var(--radius) var(--radius) 0 0':'var(--radius)'};margin-bottom:0" id="bi-${b.id}"
+        const noteRadius = hasNotes ? 'var(--radius) var(--radius) 0 0' : 'var(--radius)';
+        return `<div style="margin-bottom:8px;">
+          <div class="block-item ${b.done?'done':''}" id="bi-${b.id}"
+            style="border-radius:${noteRadius};margin-bottom:0;"
             draggable="true"
             ondragstart="onDragStart(event,'${b.id}')"
             ondragend="onDragEnd(event,'${b.id}')"
             ondragover="onDragOver(event,'${b.id}')"
-            ondrop="onDrop(event,'${b.id}')"
-            ontouchstart="onTouchDragStart(event,'${b.id}')"
-            ontouchmove="onTouchDragMove(event,'${b.id}')"
-            ontouchend="onTouchDragEnd(event,'${b.id}')"
-            onpointerdown="onBlockPointerDown(event,'${b.id}')"
-            onpointerup="onBlockPointerUp()"
-            onpointerleave="onBlockPointerLeave()">
-            <div class="drag-handle" onclick="event.stopPropagation()" ondragstart="event.stopPropagation();onDragStart(event,'${b.id}')">
+            ondrop="onDrop(event,'${b.id}')">
+            <div class="drag-handle"
+              onclick="event.stopPropagation()"
+              ontouchstart="event.stopPropagation();onTouchDragStart(event,'${b.id}')"
+              ontouchmove="event.stopPropagation();onTouchDragMove(event,'${b.id}')"
+              ontouchend="event.stopPropagation();onTouchDragEnd(event,'${b.id}')">
               <span></span><span></span><span></span>
             </div>
             <div class="block-emoji" onclick="toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">${b.emoji||'🎯'}</div>
-            <div class="block-info" onclick="toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item}'))">
+            <div class="block-info" onclick="toggleBlock('${selectedDay}','${b.id}',this.closest('.block-item'))">
               <div class="block-name">${b.name}</div>
               ${b.time?`<div class="block-time">${b.time}</div>`:''}
             </div>
